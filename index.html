@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8"/>
+    <link rel="shortcut icon" type="image/ico" href="webgl/favicon.ico"/>
+    <title>WebGL 3D Object Viewer</title>
+    <style>
+      #workArea {width: 640px; height: 480px; display: inline-block; position:relative;}
+      #viewport {z-index: 1;position: relative;height: 100%;width: 100%;}
+      #viewport:hover {cursor: grab}
+      #viewport:active {cursor: grabbing}
+      #verticalPanel {z-index: 2; position: absolute; width: 24px; right: 2px; top: 6px;}
+      #notification {position: absolute; z-index: 3; background: white; width: 100%; box-shadow:inset grey 0px 0px 0px 1px; padding: 4px 0px 4px 0px; transition: 0.2s; display: none;}
+      input[type=range][orient=vertical] {padding: 0; -webkit-appearance: slider-vertical;  writing-mode: bt-lr; width: 20px; cursor: pointer; opacity: 0.4; transition: 0.2s}
+      input[type=button] {padding: 0; width: 20px; cursor: pointer; opacity: 0.4; transition: 0.2s;}
+      input[type=button]:hover, input[type=range]:hover {opacity: 1}
+    </style>
+  </head>
+
+  <body onload="runWebGL()">
+    <div id="workArea">
+      <div id="notification">This is a notification area!</div>
+      <div id="verticalPanel">
+        <input id="litUnlit" type="button" value="L" name="Toggle Lit/Unlit">
+        <input id="viewMode" type="button" value="M" name="Toggle Solid/Wireframe/Texture">
+        <input id="btnZoomIn" type="button" value="+" name="Zoom In">
+        <input id="zoomSlider" type="range" orient="vertical" min="1" max="100" value="50">
+        <input id="btnZoomOut" type="button" value="-" name="Zoom Out">
+        <input id="btnFullScreen" type="button" value="S" name="Sync Viewport Rotation (only if multiple)">
+        <input id="btnFullScreen" type="button" value="F" name="Full Screen">
+      </div>
+      <canvas id="viewport">HTML5 is not supported, cannot draw a 3D viewport!</canvas>
+    </div>
+    <script src="webgl/core.js"></script>
+  </body>
+
+</html>
