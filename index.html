@@ -7,19 +7,20 @@
     <title>WebGL 3D Object Viewer</title>
     <style>
       #workArea {width: 640px; height: 480px; display: inline-block; position:relative;}
-      #viewport {z-index: 1;position: relative;height: 100%;width: 100%;}
-      #viewport:hover {cursor: grab}
-      #viewport:active {cursor: grabbing}
+      #viewport {z-index: 1;position: relative;height: 100%;width: 100%; transition: 0.2s}
+      #viewport:hover {cursor: grab; box-shadow: black 0px 0px 8px;}
+      #viewport:active {cursor: grabbing; box-shadow: black 0px 0px 8px;}
       #verticalPanel {z-index: 2; position: absolute; width: 24px; right: 2px; top: 6px;}
       #notification {position: absolute; z-index: 3; background: white; width: 100%; box-shadow:inset grey 0px 0px 0px 1px; padding: 4px 0px 4px 0px; transition: 0.2s; display: none;}
       input[type=range][orient=vertical] {padding: 0; -webkit-appearance: slider-vertical;  writing-mode: bt-lr; width: 20px; cursor: pointer; opacity: 0.4; transition: 0.2s}
       input[type=button] {padding: 0; width: 20px; cursor: pointer; opacity: 0.4; transition: 0.2s;}
       input[type=button]:hover, input[type=range]:hover {opacity: 1}
     </style>
+    <script src="gui.js"></script>
   </head>
 
   <body onload="runWebGL()">
-    <div id="workArea">
+    <div id="workArea" class="workArea">
       <div id="notification">This is a notification area!</div>
       <div id="verticalPanel">
         <input id="litUnlit" type="button" value="L" name="Toggle Lit/Unlit">

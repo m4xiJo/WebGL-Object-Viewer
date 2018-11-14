@@ -33,9 +33,10 @@ var runWebGL  = function () {
       (!gl) ? alert("Couldn't initialize WebGL, this might be because your browser is doesn't support it!") : console.log("loaded Experimental WebGL!");
   }
 
-  //canvas.width = window.innerWidth;
-  //canvas.height = window.innerHeigh;
-  //gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
   gl.clearColor(0.8, 0.8, 0.8, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   var vertexShader = gl.createShader(gl.VERTEX_SHADER);
