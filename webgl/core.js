@@ -25,9 +25,9 @@ var fShaderInstruct = [
   "}"
 ].join("\n");
 
-var runWebGL  = function () {
-  var canvas = document.getElementsByClassName("viewport")[0];
-  var gl = canvas.getContext("webgl");
+let runWebGL  = function () {
+  let canvas = document.getElementsByClassName("viewport")[0];
+  let gl = canvas.getContext("webgl");
 
   if (!gl) {
       console.log("WebGL is not supported, trying Experimental WebGL...");
@@ -42,8 +42,8 @@ var runWebGL  = function () {
   gl.frontFace(gl.CCW);
   gl.cullFace(gl.BACK);
 
-  var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-  var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+  let vertexShader = gl.createShader(gl.VERTEX_SHADER);
+  let fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 
   gl.shaderSource(vertexShader, vShaderInstruct);
   gl.shaderSource(fragmentShader, fShaderInstruct);
@@ -60,7 +60,7 @@ var runWebGL  = function () {
     return;
   }
 
-  var program = gl.createProgram();
+  let program = gl.createProgram();
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
   gl.linkProgram(program);
@@ -75,46 +75,46 @@ var runWebGL  = function () {
   }
 
   //Create a buffer
-  var boxVertices = [
+  let boxVertices = [
     // X, Y, Z           R, G, B
 		// Top
-		-1.0, 1.0, -1.0,   0.5, 0.5, 0.5,
-		-1.0, 1.0, 1.0,    0.5, 0.5, 0.5,
-		1.0, 1.0, 1.0,     0.5, 0.5, 0.5,
-		1.0, 1.0, -1.0,    0.5, 0.5, 0.5,
+		-1.0, 1.0, -1.0,   0.0, 0.0, 1.0,
+		-1.0, 1.0, 1.0,    0.0, 0.0, 1.0,
+		1.0, 1.0, 1.0,     0.0, 0.0, 1.0,
+		1.0, 1.0, -1.0,    0.0, 0.0, 1.0,
 
 		// Left
-		-1.0, 1.0, 1.0,    0.75, 0.25, 0.5,
-		-1.0, -1.0, 1.0,   0.75, 0.25, 0.5,
-		-1.0, -1.0, -1.0,  0.75, 0.25, 0.5,
-		-1.0, 1.0, -1.0,   0.75, 0.25, 0.5,
+		-1.0, 1.0, 1.0,    0.0, 1.0, 0.0,
+		-1.0, -1.0, 1.0,   0.0, 1.0, 0.0,
+		-1.0, -1.0, -1.0,  0.0, 1.0, 0.0,
+		-1.0, 1.0, -1.0,   0.0, 1.0, 0.0,
 
 		// Right
-		1.0, 1.0, 1.0,    0.25, 0.25, 0.75,
-		1.0, -1.0, 1.0,   0.25, 0.25, 0.75,
-		1.0, -1.0, -1.0,  0.25, 0.25, 0.75,
-		1.0, 1.0, -1.0,   0.25, 0.25, 0.75,
+		1.0, 1.0, 1.0,    1.0, 0.0, 0.0,
+		1.0, -1.0, 1.0,   1.0, 0.0, 0.0,
+		1.0, -1.0, -1.0,  1.0, 0.0, 0.0,
+		1.0, 1.0, -1.0,   1.0, 0.0, 0.0,
 
 		// Front
-		1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
-		1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
-		-1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
-		-1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
+		1.0, 1.0, 1.0,    1.0, 1.0, 0.0,
+		1.0, -1.0, 1.0,   1.0, 1.0, 0.0,
+		-1.0, -1.0, 1.0,  1.0, 1.0, 0.0,
+		-1.0, 1.0, 1.0,   1.0, 1.0, 0.0,
 
 		// Back
-		1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
-		1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
-		-1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
-		-1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
+		1.0, 1.0, -1.0,   0.0, 1.0, 1.0,
+		1.0, -1.0, -1.0,  0.0, 1.0, 1.0,
+		-1.0, -1.0, -1.0, 0.0, 1.0, 1.0,
+		-1.0, 1.0, -1.0,  0.0, 1.0, 1.0,
 
 		// Bottom
-		-1.0, -1.0, -1.0,   0.5, 0.5, 1.0,
-		-1.0, -1.0, 1.0,    0.5, 0.5, 1.0,
-		1.0, -1.0, 1.0,     0.5, 0.5, 1.0,
-		1.0, -1.0, -1.0,    0.5, 0.5, 1.0,
+		-1.0, -1.0, -1.0, 1.0, 0.0, 1.0,
+		-1.0, -1.0, 1.0,  1.0, 0.0, 1.0,
+		1.0, -1.0, 1.0,   1.0, 0.0, 1.0,
+		1.0, -1.0, -1.0,  1.0, 0.0, 1.0,
 ];
 
-  var boxIndices = [
+  let boxIndices = [
 		// Top
 		0, 1, 2,
 		0, 2, 3,
@@ -140,16 +140,16 @@ var runWebGL  = function () {
 		22, 20, 23
 ];
 
-  var boxVertexBufferObj = gl.createBuffer(); //GPU buffer
+  let boxVertexBufferObj = gl.createBuffer(); //GPU buffer
   gl.bindBuffer(gl.ARRAY_BUFFER, boxVertexBufferObj);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boxVertices), gl.STATIC_DRAW);
 
-  var boxIndexBufferObj = gl.createBuffer();
+  let boxIndexBufferObj = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, boxIndexBufferObj);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(boxIndices), gl.STATIC_DRAW);
 
-  var posAttrLocation = gl.getAttribLocation(program, "vertPosition");
-  var colorAttrLocation = gl.getAttribLocation(program, "vertColor");
+  let posAttrLocation = gl.getAttribLocation(program, "vertPosition");
+  let colorAttrLocation = gl.getAttribLocation(program, "vertColor");
 
   gl.vertexAttribPointer(
     posAttrLocation, // Location of attribute
@@ -173,13 +173,13 @@ var runWebGL  = function () {
   gl.enableVertexAttribArray(colorAttrLocation);
   gl.useProgram(program); //Tell which program is active
 
-  var matWorldUniformLocation = gl.getUniformLocation(program, "mWorld");
-  var matViewUniformLocation = gl.getUniformLocation(program, "mView");
-  var matProjUniformLocation = gl.getUniformLocation(program, "mProj");
+  let matWorldUniformLocation = gl.getUniformLocation(program, "mWorld");
+  let matViewUniformLocation = gl.getUniformLocation(program, "mView");
+  let matProjUniformLocation = gl.getUniformLocation(program, "mProj");
 
-  var projMatrix = new Float32Array(16);
-  var viewMatrix = new Float32Array(16);
-  var worldMatrix = new Float32Array(16);
+  let projMatrix = new Float32Array(16);
+  let viewMatrix = new Float32Array(16);
+  let worldMatrix = new Float32Array(16);
 
   mat4.identity(worldMatrix);
   mat4.lookAt(viewMatrix, [0, 0, -6], [0, 0, 0], [0, 1, 0]);
@@ -189,19 +189,19 @@ var runWebGL  = function () {
   gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
   gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix);
 
-  var xRotationMatrix = new Float32Array(16);
-  var yRotationMatrix = new Float32Array(16);
-  var identityMatrix = new Float32Array(16);
+  let xRotationMatrix = new Float32Array(16);
+  let yRotationMatrix = new Float32Array(16);
+  let identityMatrix = new Float32Array(16);
   mat4.identity(identityMatrix);
 
-  var angleY = 0;
-  var angleX = 0;
-  var zoomRatio = -5;
-  var mouseMoveX = 0;
-  var mouseMoveY = 0;
+  let angleY = 0;
+  let angleX = 0;
+  let zoomRatio = -5;
+  let mouseMoveX = 0;
+  let mouseMoveY = 0;
   let fpsCounter = document.getElementsByClassName("FPS")[0];
-  let startTime = new Date();
-  let currentTime = new Date();
+  let startTime = new Date().getTime();
+  let currentTime;
   let frameCounter = 0;
 
   //GUI Events
@@ -227,14 +227,28 @@ var runWebGL  = function () {
     let zoomSlider = document.getElementsByClassName("zoomSlider")[0];
     if (click.target.className === "btnZoomOut") {
       (zoomSlider.value >= 0 && zoomSlider.value >= 10) ? zoomSlider.value -= 10 : zoomSlider.value = 1;
-      console.log(zoomSlider.value);
     }
     else if (click.target.className === "btnZoomIn") {
       (zoomSlider.value <= 100 && zoomSlider.value <= 90) ? zoomSlider.value -= (-10) : zoomSlider.value = 100;
-      console.log(zoomSlider.value);
     }
+
+    else if (click.target.className === "topView") {
+      angleY = -1.6;
+      angleX = 0;
+    }
+
+    else if (click.target.className === "xView") {
+      angleY = 0;
+      angleX = -1.6;
+    }
+
+    else if (click.target.className === "yView") {
+      angleY = 0;
+      angleX = 0;
+    }
+
     else if (click.target.className === "btnFullScreen") {
-      var element = document.getElementsByClassName("workArea")[0];
+      let element = document.getElementsByClassName("workArea")[0];
       if (!window.fullScreen) {
         if (element.requestFullscreen) { element.requestFullscreen(); return; }
         if (element.mozRequestFullScreen) { element.mozRequestFullScreen(); return; }
@@ -251,11 +265,11 @@ var runWebGL  = function () {
   }, false);
 
   // Render update loop
-  var updateLoop = function () {
+  let updateLoop = function () {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
-    //angle = performance.now() / 6000 * Math.PI;
+    //angleX = performance.now() / 6000 * Math.PI;
 		mat4.rotate(yRotationMatrix, identityMatrix, angleX, [0, 1, 0]);
 		mat4.rotate(xRotationMatrix, identityMatrix, angleY, [1, 0, 0]);
 		mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
@@ -264,10 +278,9 @@ var runWebGL  = function () {
     gl.clearColor(0.8, 0.8, 0.8, 1.0);
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
     gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
-    currentTime = new Date();
+    currentTime = new Date().getTime();
+    fpsCounter.innerText = parseInt(frameCounter / (currentTime - startTime) * 1000);
     frameCounter++;
-    fpsCounter.innerText = parseInt(frameCounter / (currentTime.getTime() - startTime.getTime()) * 1000);
-
     requestAnimationFrame(updateLoop);
   }
   requestAnimationFrame(updateLoop);
