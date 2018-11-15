@@ -207,15 +207,13 @@ var runWebGL  = function () {
   //GUI Events
   document.getElementsByClassName("viewport")[0].addEventListener('mousemove', inputMoveListen = function (move) {
     if (move.clientX && move.buttons == 1) {
-      mouseMoveX = move.clientX - mouseMoveX;
-      angleX = (mouseMoveX * 0.02).toFixed(1);
-      //console.log((mouseMoveX * 0.02).toFixed(1));
+      angleX += ((move.clientX - mouseMoveX) * 0.01)
     }
     if (move.clientY && move.buttons == 1) {
-      mouseMoveY = move.clientY - mouseMoveY;
-      angleY = -Math.abs((mouseMoveY * 0.02).toFixed(1));
-      //console.log(mouseMoveY * 0.02);
+      angleY -= ((move.clientY - mouseMoveY) * 0.01);
     }
+    mouseMoveX = move.clientX;
+    mouseMoveY = move.clientY;
   }, false);
 
   document.addEventListener('wheel', inputScrollListen = function (scroll) {
