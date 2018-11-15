@@ -6,33 +6,57 @@
     <link rel="shortcut icon" type="image/ico" href="webgl/favicon.ico"/>
     <title>WebGL 3D Object Viewer</title>
     <style>
-      #workArea {width: 640px; height: 480px; display: inline-block; position:relative;}
-      #viewport {z-index: 1;position: relative;height: 100%;width: 100%; transition: 0.2s}
-      #viewport:hover {cursor: grab; box-shadow: black 0px 0px 8px;}
-      #viewport:active {cursor: grabbing; box-shadow: black 0px 0px 8px;}
-      #verticalPanel {z-index: 2; position: absolute; width: 24px; right: 2px; top: 6px;}
-      #notification {position: absolute; z-index: 3; background: white; width: 100%; box-shadow:inset grey 0px 0px 0px 1px; padding: 4px 0px 4px 0px; transition: 0.2s; display: none;}
-      input[type=range][orient=vertical] {padding: 0; -webkit-appearance: slider-vertical;  writing-mode: bt-lr; width: 20px; cursor: pointer; opacity: 0.4; transition: 0.2s}
-      input[type=button] {padding: 0; width: 20px; cursor: pointer; opacity: 0.4; transition: 0.2s;}
+
+    @font-face {
+        font-family: 'Material Icons';
+        font-style: normal;
+        font-weight: 400;
+        src: url('fonts/Material/MaterialIcons-Regular.eot'); /* For IE6-8 */
+        src: local("Material Icons"),
+          local('MaterialIcons-Regular'),
+          url('fonts/Material/MaterialIcons-Regular.woff2') format('woff2'),
+          url('fonts/Material/MaterialIcons-Regular.woff') format('woff'),
+          url('fonts/Material/MaterialIcons-Regular.ttf') format('truetype'),
+          url('fonts/Material/MaterialIcons-Regular.svg') format("svg")
+      }
+
+      body, input {font-family: Agency FB;}
+      .workArea {width: 640px; height: 480px; display: inline-block; position:relative;}
+      .viewport {z-index: 1;position: relative;height: 100%;width: 100%; transition: 0.2s}
+      .viewport:hover {cursor: grab; box-shadow: black 0px 0px 8px;}
+      .viewport:active {cursor: grabbing; box-shadow: black 0px 0px 8px;}
+      .verticalPanel {z-index: 2; position: absolute; width: 24px; right: 2px; top: 6px; height: 100%;}
+      .notification {position: absolute; z-index: 3; background: white; width: 100%; box-shadow:inset grey 0px 0px 0px 1px; padding: 4px 0px 4px 0px; transition: 0.2s; display: none;}
+      input[type=range][orient=vertical] {outline: 0; padding: 0; -webkit-appearance: slider-vertical;  writing-mode: bt-lr; width: 20px; cursor: pointer; opacity: 0.4; transition: 0.2s}
+      input[type=button] {outline: 0; padding: 0px 17px 0px 0px; display: block; width: 20px; cursor: pointer; opacity: 0.4; transition: 0.2s; font-family: Material Icons; font-size: 16px;}
       input[type=button]:hover, input[type=range]:hover {opacity: 1}
+      input::-moz-focus-inner {border: 0; outline: 0;}
+      .FPS {background: green; padding: 0px 2px 0px 2px; color: white; margin: 0px 3px 10px 0px; font-weight: normal; font-size: small; display: block}
     </style>
     <script src="gui.js"></script>
   </head>
 
   <body onload="runWebGL()">
-    <div id="workArea" class="workArea">
-      <div id="notification">This is a notification area!</div>
-      <div id="verticalPanel">
-        <input id="litUnlit" type="button" value="L" name="Toggle Lit/Unlit">
-        <input id="viewMode" type="button" value="M" name="Toggle Solid/Wireframe/Texture">
-        <input id="btnZoomIn" type="button" value="+" name="Zoom In">
-        <input id="zoomSlider" type="range" orient="vertical" min="1" max="100" value="50">
-        <input id="btnZoomOut" type="button" value="-" name="Zoom Out">
-        <input id="btnFullScreen" type="button" value="S" name="Sync Viewport Rotation (only if multiple)">
-        <input id="btnFullScreen" type="button" value="F" name="Full Screen">
+    <div class="workArea" class="workArea">
+      <div class="notification">This is a notification area!</div>
+      <div class="verticalPanel">
+        <a class="FPS">0</a>
+        <input class="topView" type="button" value="&#xe5db" name="Top View">
+        <input class="xView" type="button" value="&#xe5c4" name="X View">
+        <input class="yView" type="button" value="&#xe5c8" name="Y View">
+        <input class="litUnlit" type="button" value="&#xe90f" name="Toggle Lit/Unlit">
+        <input class="btnZoomIn" type="button" value="&#xe8ff" name="Zoom In">
+        <input class="zoomSlider" type="range" orient="vertical" min="1" max="100" value="50">
+        <input class="btnZoomOut" type="button" value="&#xe900" name="Zoom Out">
+        <input class="viewMode" type="button" value="&#xe84d" name="Toggle Solid/Wireframe/Texture">
+        <input class="btnFullScreen" type="button" value="&#xe627" name="Sync Viewport Rotation (only if multiple)">
+        <input class="btnGrid" type="button" value="&#xe3ec" name="Toggle Grid">
+        <input class="btnFullScreen" type="button" value="&#xe5d0" name="Full Screen" style="bottom: 9px; position: absolute;">
+        <!--<input class="btnFullScreen" type="button" value="&#xe5d0" name="Full Screen">-->
       </div>
-      <canvas id="viewport">HTML5 is not supported, cannot draw a 3D viewport!</canvas>
+      <canvas class="viewport">HTML5 is not supported, cannot draw a 3D viewport!</canvas>
     </div>
+    <script src="webgl/gl-matrix.js"></script>
     <script src="webgl/core.js"></script>
   </body>
 
