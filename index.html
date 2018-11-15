@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html>
-
   <head>
     <meta charset="utf-8"/>
     <link rel="shortcut icon" type="image/ico" href="webgl/favicon.ico"/>
     <title>WebGL 3D Object Viewer</title>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css">
   </head>
-
   <body onload="runWebGL()">
     <div class="workArea" class="workArea">
       <div class="notification">This is a notification area!</div>
@@ -24,7 +22,6 @@
         <input class="btnSyncViewport" type="button" value="&#xe627" name="Sync Viewport Rotation (only if multiple)">
         <input class="btnGrid" type="button" value="&#xe3ec" name="Toggle Grid">
         <input class="btnFullScreen" type="button" value="&#xe5d0" name="Full Screen" style="bottom: 9px; position: absolute;">
-        <!--<input class="btnFullScreen" type="button" value="&#xe5d0" name="Full Screen">-->
       </div>
       <canvas class="viewport">HTML5 is not supported, cannot draw a 3D viewport!</canvas>
     </div>
@@ -38,5 +35,4 @@
     <script src="webgl/parsers/fbx.js"></script>
     <script src="webgl/parsers/max.js"></script>
   </body>
-
 </html>
