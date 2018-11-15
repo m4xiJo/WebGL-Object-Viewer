@@ -35,10 +35,6 @@ var runWebGL  = function () {
       (!gl) ? alert("Couldn't initialize WebGL, this might be because your browser is doesn't support it!") : console.log("loaded Experimental WebGL!");
   }
 
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
-  gl.viewport(0, 0, canvas.width, canvas.height);
-
   gl.clearColor(0.8, 0.8, 0.8, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.DEPTH_TEST);
@@ -241,30 +237,31 @@ var runWebGL  = function () {
     }
     else if (click.target.className === "btnFullScreen") {
       var element = document.getElementsByClassName("workArea")[0];
-        if (element.requestFullscreen) {
-          element.requestFullscreen();
-        } else if (element.mozRequestFullScreen) { /* Firefox */
-          element.mozRequestFullScreen();
-        } else if (element.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-          element.webkitRequestFullscreen();
-        } else if (element.msRequestFullscreen) { /* IE/Edge */
-          element.msRequestFullscreen();
-        }
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
-        gl.viewport(0, 0, canvas.width, canvas.height);
+      if (!window.fullScreen) {
+        if (element.requestFullscreen) { element.requestFullscreen(); return; }
+        if (element.mozRequestFullScreen) { element.mozRequestFullScreen(); return; }
+        if (element.webkitRequestFullscreen) { element.webkitRequestFullscreen(); return; }
+        if (element.msRequestFullscreen) { element.msRequestFullscreen(); return; }
+      }
+      if (window.fullScreen) {
+        if (document.exitFullscreen) { document.exitFullscreen(); return; }
+        if (document.mozCancelFullScreen) { document.mozCancelFullScreen(); return; }
+        if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); return; }
+        if (document.msExitFullscreen) { document.msExitFullscreen(); return; }
+      }
     }
-
   }, false);
 
   // Render update loop
   var updateLoop = function () {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
     //angle = performance.now() / 6000 * Math.PI;
 		mat4.rotate(yRotationMatrix, identityMatrix, angleX, [0, 1, 0]);
 		mat4.rotate(xRotationMatrix, identityMatrix, angleY, [1, 0, 0]);
 		mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
     gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
-    //console.log(angle);
 
     gl.clearColor(0.8, 0.8, 0.8, 1.0);
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
