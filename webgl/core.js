@@ -214,7 +214,15 @@ let runWebGL  = function () {
     }
     mouseMoveX = move.clientX;
     mouseMoveY = move.clientY;
+
+    if (move.clientX && move.buttons == 2)
+      move.target.style.cursor = "move";
+    else {
+      move.target.style.cursor = null;
+    }
   }, false);
+
+
 
   document.addEventListener('wheel', inputScrollListen = function (scroll) {
     let zoomSlider = document.getElementsByClassName("zoomSlider")[0];
