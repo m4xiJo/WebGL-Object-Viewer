@@ -1,16 +1,19 @@
+const allScripts = document.getElementsByTagName('script'); //Get all script paths
+const lastScript = allScripts[allScripts.length-1].src.split('?')[0].replace(/\/[\w\d\.]+\/[\w\d\.]+$/, ''); //Get the root path
+
 var vShaderInstruct = [
   "precision mediump float;",
   "",
   "attribute vec3 vertPosition;",
-  "attribute vec3 vertColor;",
-  "varying vec3 fragColor;",
+  "attribute vec2 vertTexCoord;",
+  "varying vec2 fragTexCoord;",
   "uniform mat4 mWorld;",
   "uniform mat4 mView;",
   "uniform mat4 mProj;",
   "",
   "void main()",
   "{",
-  " fragColor = vertColor;",
+  " fragTexCoord = vertTexCoord;",
   " gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);",
   "}"
 ].join("\n");
@@ -18,75 +21,64 @@ var vShaderInstruct = [
 var fShaderInstruct = [
   "precision mediump float;",
   "",
-  "varying vec3 fragColor;",
+  "varying vec2 fragTexCoord;",
+  "uniform sampler2D sampler;",
+  "",
   "void main()",
   "{",
-  " gl_FragColor = vec4(fragColor, 1.0);",
+  " gl_FragColor = texture2D(sampler, fragTexCoord);",
   "}"
 ].join("\n");
 
 //Create a buffer
 var boxVertices = [
-  // X, Y, Z           R, G, B
-  // Top
-  -1.0, 1.0, -1.0,   0.0, 0.0, 1.0,
-  -1.0, 1.0, 1.0,    0.0, 0.0, 1.0,
-  1.0, 1.0, 1.0,     0.0, 0.0, 1.0,
-  1.0, 1.0, -1.0,    0.0, 0.0, 1.0,
+  -1.0, 1.0, -1.0,   0, 0,
+  -1.0, 1.0, 1.0,    0, 1,
+  1.0, 1.0, 1.0,     1, 1,
+  1.0, 1.0, -1.0,    1, 0,
 
-  // Left
-  -1.0, 1.0, 1.0,    0.0, 1.0, 0.0,
-  -1.0, -1.0, 1.0,   0.0, 1.0, 0.0,
-  -1.0, -1.0, -1.0,  0.0, 1.0, 0.0,
-  -1.0, 1.0, -1.0,   0.0, 1.0, 0.0,
+  -1.0, 1.0, 1.0,    0, 0,
+  -1.0, -1.0, 1.0,   1, 0,
+  -1.0, -1.0, -1.0,  1, 1,
+  -1.0, 1.0, -1.0,   0, 1,
 
-  // Right
-  1.0, 1.0, 1.0,    1.0, 0.0, 0.0,
-  1.0, -1.0, 1.0,   1.0, 0.0, 0.0,
-  1.0, -1.0, -1.0,  1.0, 0.0, 0.0,
-  1.0, 1.0, -1.0,   1.0, 0.0, 0.0,
+  1.0, 1.0, 1.0,    1, 1,
+  1.0, -1.0, 1.0,   0, 1,
+  1.0, -1.0, -1.0,  0, 0,
+  1.0, 1.0, -1.0,   1, 0,
 
-  // Front
-  1.0, 1.0, 1.0,    1.0, 1.0, 0.0,
-  1.0, -1.0, 1.0,   1.0, 1.0, 0.0,
-  -1.0, -1.0, 1.0,  1.0, 1.0, 0.0,
-  -1.0, 1.0, 1.0,   1.0, 1.0, 0.0,
+  1.0, 1.0, 1.0,    1, 1,
+  1.0, -1.0, 1.0,    1, 0,
+  -1.0, -1.0, 1.0,    0, 0,
+  -1.0, 1.0, 1.0,    0, 1,
 
-  // Back
-  1.0, 1.0, -1.0,   0.0, 1.0, 1.0,
-  1.0, -1.0, -1.0,  0.0, 1.0, 1.0,
-  -1.0, -1.0, -1.0, 0.0, 1.0, 1.0,
-  -1.0, 1.0, -1.0,  0.0, 1.0, 1.0,
+  1.0, 1.0, -1.0,     0, 0,
+  1.0, -1.0, -1.0,     0, 1,
+  -1.0, -1.0, -1.0,    1, 1,
+  -1.0, 1.0, -1.0,      1, 0,
 
-  // Bottom
-  -1.0, -1.0, -1.0, 1.0, 0.0, 1.0,
-  -1.0, -1.0, 1.0,  1.0, 0.0, 1.0,
-  1.0, -1.0, 1.0,   1.0, 0.0, 1.0,
-  1.0, -1.0, -1.0,  1.0, 0.0, 1.0,
+  -1.0, -1.0, -1.0,   1, 1,
+  -1.0, -1.0, 1.0,    1, 0,
+  1.0, -1.0, 1.0,     0, 0,
+  1.0, -1.0, -1.0,    0, 1,
 ];
 
 var boxIndices = [
-  // Top
   0, 1, 2,
   0, 2, 3,
 
-  // Left
   5, 4, 6,
   6, 4, 7,
 
-  // Right
   8, 9, 10,
   8, 10, 11,
 
-  // Front
   13, 12, 14,
   15, 14, 12,
 
-  // Back
   16, 17, 18,
   16, 18, 19,
 
-  // Bottom
   21, 20, 22,
   22, 20, 23
 ];
@@ -150,28 +142,39 @@ let runWebGL  = function () {
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(boxIndices), gl.STATIC_DRAW);
 
   let posAttrLocation = gl.getAttribLocation(program, "vertPosition");
-  let colorAttrLocation = gl.getAttribLocation(program, "vertColor");
+  let texCoordAttrLocation = gl.getAttribLocation(program, "vertTexCoord");
 
   gl.vertexAttribPointer(
     posAttrLocation, // Location of attribute
     3, // Number of elements per attribute
     gl.FLOAT, // Type of elements
     gl.FALSE, // Normalized?
-    6 * Float32Array.BYTES_PER_ELEMENT, // Size of individual vertex
+    5 * Float32Array.BYTES_PER_ELEMENT, // Size of individual vertex
     0 // Offset from the beginning of a single vertex to this attribute
   );
 
   gl.vertexAttribPointer(
-    colorAttrLocation, // Location of attribute
-    3, // Number of elements per attribute
+    texCoordAttrLocation, // Location of attribute
+    2, // Number of elements per attribute
     gl.FLOAT, // Type of elements
     gl.FALSE, // Normalized?
-    6 * Float32Array.BYTES_PER_ELEMENT, // Size of individual vertex
+    5 * Float32Array.BYTES_PER_ELEMENT, // Size of individual vertex
     3 * Float32Array.BYTES_PER_ELEMENT // Offset from the beginning of a single vertex to this attribute
   );
 
   gl.enableVertexAttribArray(posAttrLocation);
-  gl.enableVertexAttribArray(colorAttrLocation);
+  gl.enableVertexAttribArray(texCoordAttrLocation);
+
+  var texture_d = new Image();
+  texture_d.src = lastScript + "/fixtures/sample/textures/crate1_diffuse.png";
+  var boxTexture = gl.createTexture(); // Create Texture
+  gl.bindTexture(gl.TEXTURE_2D, boxTexture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_d);
+  gl.bindTexture(gl.TEXTURE_2D, null);
   gl.useProgram(program); //Tell which program is active
 
   let matWorldUniformLocation = gl.getUniformLocation(program, "mWorld");
@@ -344,6 +347,8 @@ let runWebGL  = function () {
     gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
     gl.clearColor(0.8, 0.8, 0.8, 1.0);
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+    gl.bindTexture(gl.TEXTURE_2D, boxTexture);
+    gl.activeTexture(gl.TEXTURE0);
     gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
     currentTime = new Date().getTime();
     fpsCounter.innerText = parseInt(frameCounter / (currentTime - startTime) * 1000);
