@@ -197,6 +197,7 @@ let runWebGL  = function () {
   let zoomRatio = 0;
   let mouseMoveX = 0;
   let mouseMoveY = 0;
+  let autoRotate = true;
   let fpsCounter = document.getElementsByClassName("FPS")[0];
   let startTime = new Date().getTime();
   let currentTime;
@@ -297,6 +298,11 @@ let runWebGL  = function () {
       (click.target.value !== String.fromCharCode("0xE25F")) ? click.target.value = String.fromCharCode("0xE25F") : click.target.value = String.fromCharCode("0xE90F");
     }
 
+    else if (click.target.className === "btnRotation" && click.button == 0) {
+      autoRotate ^= true;
+      (click.target.value !== String.fromCharCode("0xE036")) ? click.target.value = String.fromCharCode("0xE036") : click.target.value = String.fromCharCode("0xE84D");
+    }
+
     else if (click.target.classList[0] === "btnWarnings" && click.button == 0) {
       if (click.target.value !== String.fromCharCode("0xE86C")) {
         click.target.value = String.fromCharCode("0xE86C");
@@ -333,7 +339,7 @@ let runWebGL  = function () {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
-    //angleX = performance.now() / 6000 * Math.PI;
+    (autoRotate) ? angleX = performance.now() / 6000 * Math.PI : null;
 		mat4.rotate(yRotationMatrix, identityMatrix, angleX, [0, 1, 0]);
 		mat4.rotate(xRotationMatrix, identityMatrix, angleY, [1, 0, 0]);
 		mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
