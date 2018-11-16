@@ -1,34 +1,27 @@
 const allScripts = document.getElementsByTagName('script'); //Get all script paths
 const lastScript = allScripts[allScripts.length-1].src.split('?')[0].replace(/\/[\w\d\.]+\/[\w\d\.]+$/, ''); //Get the root path
 
+//Compile shaders
 var vShaderInstruct = [
   "precision mediump float;",
-  "",
   "attribute vec3 vertPosition;",
   "attribute vec2 vertTexCoord;",
   "varying vec2 fragTexCoord;",
   "uniform mat4 mWorld;",
   "uniform mat4 mView;",
   "uniform mat4 mProj;",
-  "",
-  "void main()",
-  "{",
-  " fragTexCoord = vertTexCoord;",
-  " gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);",
-  "}"
-].join("\n");
+  "void main() {",
+    "fragTexCoord = vertTexCoord;",
+    "gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);",
+  "}"].join("\n\r");
 
 var fShaderInstruct = [
   "precision mediump float;",
-  "",
   "varying vec2 fragTexCoord;",
   "uniform sampler2D sampler;",
-  "",
-  "void main()",
-  "{",
-  " gl_FragColor = texture2D(sampler, fragTexCoord);",
-  "}"
-].join("\n");
+  "void main() {",
+    "gl_FragColor = texture2D(sampler, fragTexCoord);",
+  "}"].join("\n\r");
 
 //Create a buffer
 var boxVertices = [
