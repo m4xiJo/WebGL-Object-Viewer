@@ -196,14 +196,15 @@ let runWebGL  = function () {
 
   let angleY = 0;
   let angleX = 0;
-  let zoomRatio = -5;
+  let zoomRatio = 0;
   let mouseMoveX = 0;
   let mouseMoveY = 0;
   let fpsCounter = document.getElementsByClassName("FPS")[0];
   let startTime = new Date().getTime();
   let currentTime;
   let frameCounter = 0;
-
+  let isScrolling;
+  let isMoving;
   //GUI Events
   document.getElementsByClassName("viewport")[0].addEventListener('mousemove', inputMoveListen = function (move) {
     if (move.clientX && move.buttons == 1) {
@@ -217,17 +218,22 @@ let runWebGL  = function () {
 
     if (move.clientX && move.buttons == 2)
       move.target.style.cursor = "move";
-    else {
-      move.target.style.cursor = null;
-    }
+        window.clearTimeout(isMoving);
+        isMoving = setTimeout(function() {
+          move.target.style.cursor = null;
+        }, 50);
   }, false);
-
-
 
   document.addEventListener('wheel', inputScrollListen = function (scroll) {
     let zoomSlider = document.getElementsByClassName("zoomSlider")[0];
     if (scroll.deltaY && (scroll.target.className === "viewport" || scroll.target.className === "workArea")) {
       zoomSlider.value -= scroll.deltaY * 0.6;
+      if (scroll.deltaY < 0) scroll.target.style.cursor = "zoom-in";
+      if (scroll.deltaY > 0) scroll.target.style.cursor = "zoom-out";
+      window.clearTimeout(isScrolling);
+      isScrolling = setTimeout(function() {
+        scroll.target.style.cursor = null;
+      }, 200);
     }
   }, false);
 
