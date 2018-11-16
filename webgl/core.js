@@ -92,6 +92,7 @@ var boxIndices = [
 ];
 
 let runWebGL  = function () {
+  //Initialize WebGL
   let canvas = document.getElementsByClassName("viewport")[0];
   let gl = canvas.getContext("webgl");
 
@@ -194,6 +195,7 @@ let runWebGL  = function () {
   let identityMatrix = new Float32Array(16);
   mat4.identity(identityMatrix);
 
+  //Global variables
   let angleY = 0;
   let angleX = 0;
   let zoomRatio = 0;
@@ -205,6 +207,15 @@ let runWebGL  = function () {
   let frameCounter = 0;
   let isScrolling;
   let isMoving;
+  let viewGrid = true;
+  let lightingMode = 1;
+  let viewMode = 1;
+
+  window.onfocus = function() {
+    startTime = new Date().getTime();
+    frameCounter = 0;
+  };
+
   //GUI Events
   document.getElementsByClassName("viewport")[0].addEventListener('mousemove', inputMoveListen = function (move) {
     if (move.clientX && move.buttons == 1) {
@@ -302,6 +313,7 @@ let runWebGL  = function () {
         click.target.classList.add("error");
       }
     }
+
     else if (click.target.className === "btnFullScreen" && click.button == 0) {
       (click.target.value !== String.fromCharCode("0xE5D1")) ? click.target.value = String.fromCharCode("0xE5D1") : click.target.value = String.fromCharCode("0xE5D0");
       let element = document.getElementsByClassName("workArea")[0];
@@ -330,7 +342,6 @@ let runWebGL  = function () {
 		mat4.rotate(xRotationMatrix, identityMatrix, angleY, [1, 0, 0]);
 		mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
     gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
-
     gl.clearColor(0.8, 0.8, 0.8, 1.0);
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
     gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
