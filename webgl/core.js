@@ -25,6 +25,72 @@ var fShaderInstruct = [
   "}"
 ].join("\n");
 
+//Create a buffer
+var boxVertices = [
+  // X, Y, Z           R, G, B
+  // Top
+  -1.0, 1.0, -1.0,   0.0, 0.0, 1.0,
+  -1.0, 1.0, 1.0,    0.0, 0.0, 1.0,
+  1.0, 1.0, 1.0,     0.0, 0.0, 1.0,
+  1.0, 1.0, -1.0,    0.0, 0.0, 1.0,
+
+  // Left
+  -1.0, 1.0, 1.0,    0.0, 1.0, 0.0,
+  -1.0, -1.0, 1.0,   0.0, 1.0, 0.0,
+  -1.0, -1.0, -1.0,  0.0, 1.0, 0.0,
+  -1.0, 1.0, -1.0,   0.0, 1.0, 0.0,
+
+  // Right
+  1.0, 1.0, 1.0,    1.0, 0.0, 0.0,
+  1.0, -1.0, 1.0,   1.0, 0.0, 0.0,
+  1.0, -1.0, -1.0,  1.0, 0.0, 0.0,
+  1.0, 1.0, -1.0,   1.0, 0.0, 0.0,
+
+  // Front
+  1.0, 1.0, 1.0,    1.0, 1.0, 0.0,
+  1.0, -1.0, 1.0,   1.0, 1.0, 0.0,
+  -1.0, -1.0, 1.0,  1.0, 1.0, 0.0,
+  -1.0, 1.0, 1.0,   1.0, 1.0, 0.0,
+
+  // Back
+  1.0, 1.0, -1.0,   0.0, 1.0, 1.0,
+  1.0, -1.0, -1.0,  0.0, 1.0, 1.0,
+  -1.0, -1.0, -1.0, 0.0, 1.0, 1.0,
+  -1.0, 1.0, -1.0,  0.0, 1.0, 1.0,
+
+  // Bottom
+  -1.0, -1.0, -1.0, 1.0, 0.0, 1.0,
+  -1.0, -1.0, 1.0,  1.0, 0.0, 1.0,
+  1.0, -1.0, 1.0,   1.0, 0.0, 1.0,
+  1.0, -1.0, -1.0,  1.0, 0.0, 1.0,
+];
+
+var boxIndices = [
+  // Top
+  0, 1, 2,
+  0, 2, 3,
+
+  // Left
+  5, 4, 6,
+  6, 4, 7,
+
+  // Right
+  8, 9, 10,
+  8, 10, 11,
+
+  // Front
+  13, 12, 14,
+  15, 14, 12,
+
+  // Back
+  16, 17, 18,
+  16, 18, 19,
+
+  // Bottom
+  21, 20, 22,
+  22, 20, 23
+];
+
 let runWebGL  = function () {
   let canvas = document.getElementsByClassName("viewport")[0];
   let gl = canvas.getContext("webgl");
@@ -73,72 +139,6 @@ let runWebGL  = function () {
     console.error("ERROR validating program!", gl.getProgramInfoLog(program));
     return;
   }
-
-  //Create a buffer
-  let boxVertices = [
-    // X, Y, Z           R, G, B
-		// Top
-		-1.0, 1.0, -1.0,   0.0, 0.0, 1.0,
-		-1.0, 1.0, 1.0,    0.0, 0.0, 1.0,
-		1.0, 1.0, 1.0,     0.0, 0.0, 1.0,
-		1.0, 1.0, -1.0,    0.0, 0.0, 1.0,
-
-		// Left
-		-1.0, 1.0, 1.0,    0.0, 1.0, 0.0,
-		-1.0, -1.0, 1.0,   0.0, 1.0, 0.0,
-		-1.0, -1.0, -1.0,  0.0, 1.0, 0.0,
-		-1.0, 1.0, -1.0,   0.0, 1.0, 0.0,
-
-		// Right
-		1.0, 1.0, 1.0,    1.0, 0.0, 0.0,
-		1.0, -1.0, 1.0,   1.0, 0.0, 0.0,
-		1.0, -1.0, -1.0,  1.0, 0.0, 0.0,
-		1.0, 1.0, -1.0,   1.0, 0.0, 0.0,
-
-		// Front
-		1.0, 1.0, 1.0,    1.0, 1.0, 0.0,
-		1.0, -1.0, 1.0,   1.0, 1.0, 0.0,
-		-1.0, -1.0, 1.0,  1.0, 1.0, 0.0,
-		-1.0, 1.0, 1.0,   1.0, 1.0, 0.0,
-
-		// Back
-		1.0, 1.0, -1.0,   0.0, 1.0, 1.0,
-		1.0, -1.0, -1.0,  0.0, 1.0, 1.0,
-		-1.0, -1.0, -1.0, 0.0, 1.0, 1.0,
-		-1.0, 1.0, -1.0,  0.0, 1.0, 1.0,
-
-		// Bottom
-		-1.0, -1.0, -1.0, 1.0, 0.0, 1.0,
-		-1.0, -1.0, 1.0,  1.0, 0.0, 1.0,
-		1.0, -1.0, 1.0,   1.0, 0.0, 1.0,
-		1.0, -1.0, -1.0,  1.0, 0.0, 1.0,
-];
-
-  let boxIndices = [
-		// Top
-		0, 1, 2,
-		0, 2, 3,
-
-		// Left
-		5, 4, 6,
-		6, 4, 7,
-
-		// Right
-		8, 9, 10,
-		8, 10, 11,
-
-		// Front
-		13, 12, 14,
-		15, 14, 12,
-
-		// Back
-		16, 17, 18,
-		16, 18, 19,
-
-		// Bottom
-		21, 20, 22,
-		22, 20, 23
-];
 
   let boxVertexBufferObj = gl.createBuffer(); //GPU buffer
   gl.bindBuffer(gl.ARRAY_BUFFER, boxVertexBufferObj);
@@ -225,29 +225,71 @@ let runWebGL  = function () {
 
   document.addEventListener('click', inputClickListen = function (click) {
     let zoomSlider = document.getElementsByClassName("zoomSlider")[0];
-    if (click.target.className === "btnZoomOut") {
+    if (click.target.className === "btnZoomOut" && click.button == 0) {
       (zoomSlider.value >= 0 && zoomSlider.value >= 10) ? zoomSlider.value -= 10 : zoomSlider.value = 1;
     }
-    else if (click.target.className === "btnZoomIn") {
+    else if (click.target.className === "btnZoomIn" && click.button == 0) {
       (zoomSlider.value <= 100 && zoomSlider.value <= 90) ? zoomSlider.value -= (-10) : zoomSlider.value = 100;
     }
 
-    else if (click.target.className === "topView") {
+    else if (click.target.className === "topView" && click.button == 0) {
       angleY = -1.6;
       angleX = 0;
     }
 
-    else if (click.target.className === "xView") {
+    else if (click.target.className === "xView" && click.button == 0) {
       angleY = 0;
       angleX = -1.6;
     }
 
-    else if (click.target.className === "yView") {
+    else if (click.target.className === "yView" && click.button == 0) {
       angleY = 0;
       angleX = 0;
     }
 
-    else if (click.target.className === "btnFullScreen") {
+    else if (click.target.className === "viewMode" && click.button == 0) {
+      let values = ["0xE3A2", "0xE22A", "0xE3F4"];
+      let handleIndex = values.indexOf("0x" + click.target.value.charCodeAt(0).toString(16).toUpperCase()) + 1;
+      if ((values.indexOf("0x" + click.target.value.charCodeAt(0).toString(16).toUpperCase()) + 1) >= values.length) handleIndex = 0;
+      switch (handleIndex) {
+        case 0:
+          click.target.value = String.fromCharCode("0xE3A2");
+          break;
+        case 1:
+          click.target.value = String.fromCharCode("0xE22A");
+          break;
+        case 2:
+          click.target.value = String.fromCharCode("0xE3F4");
+          break;
+      }
+    }
+
+    else if (click.target.className === "btnGrid" && click.button == 0) {
+      (click.target.value !== String.fromCharCode("0xE3EB")) ? click.target.value = String.fromCharCode("0xE3EB") : click.target.value = String.fromCharCode("0xE3EC");
+    }
+
+    else if (click.target.className === "btnSyncViewport" && click.button == 0) {
+      (click.target.value !== String.fromCharCode("0xE628")) ? click.target.value = String.fromCharCode("0xE628") : click.target.value = String.fromCharCode("0xE627");
+    }
+
+    else if (click.target.className === "litUnlit" && click.button == 0) {
+      (click.target.value !== String.fromCharCode("0xE25F")) ? click.target.value = String.fromCharCode("0xE25F") : click.target.value = String.fromCharCode("0xE90F");
+    }
+
+    else if (click.target.classList[0] === "btnWarnings" && click.button == 0) {
+      if (click.target.value !== String.fromCharCode("0xE86C")) {
+        click.target.value = String.fromCharCode("0xE86C");
+        click.target.classList.remove("error");
+        click.target.classList.add("ok");
+      }
+      else {
+        click.target.value = String.fromCharCode("0xE002");
+        click.target.classList.remove("ok");
+        click.target.classList.add("error");
+      }
+    }
+    else if (click.target.className === "btnFullScreen" && click.button == 0) {
+      (click.target.value !== String.fromCharCode("0xE5D1")) ? click.target.value = String.fromCharCode("0xE5D1") : click.target.value = String.fromCharCode("0xE5D0");
       let element = document.getElementsByClassName("workArea")[0];
       if (!window.fullScreen) {
         if (element.requestFullscreen) { element.requestFullscreen(); return; }
