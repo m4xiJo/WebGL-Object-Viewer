@@ -168,13 +168,13 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   gl.bindBuffer(gl.ARRAY_BUFFER, meshVertexBufferObj);
   let posAttrLocation = gl.getAttribLocation(program, "vertPosition");
   // Location of attribute, Number of elements per attribute, Type of elements, Normalized?, Size of individual vertex, Offset from the beginning of a single vertex to this attribute
-  gl.vertexAttribPointer(posAttrLocation, 3, gl.FLOAT, gl.FALSE, 5 * Float32Array.BYTES_PER_ELEMENT, 0);
+  gl.vertexAttribPointer(posAttrLocation, 3, gl.FLOAT, gl.FALSE, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
   gl.enableVertexAttribArray(posAttrLocation);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBufferObj);
   let texCoordAttrLocation = gl.getAttribLocation(program, "vertTexCoord");
   // Location of attribute, Number of elements per attribute, Type of elements, Normalized?, Size of individual vertex, Offset from the beginning of a single vertex to this attribute
-  gl.vertexAttribPointer(texCoordAttrLocation, 2, gl.FLOAT, gl.FALSE, 5 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
+  gl.vertexAttribPointer(texCoordAttrLocation, 2, gl.FLOAT, gl.FALSE, 2 * Float32Array.BYTES_PER_ELEMENT, 0);
   gl.enableVertexAttribArray(texCoordAttrLocation);
 
   //Tell which program is active
