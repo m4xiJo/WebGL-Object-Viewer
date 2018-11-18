@@ -1,5 +1,4 @@
 function runWebGL(meshPath, adPath, nbPath, smPath, grPath) {
-
   // Prepare Vertex shader
   let vertexShader = [
     "precision mediump float;",
@@ -303,22 +302,22 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
       (zoomSlider.value <= 100 && zoomSlider.value <= 90) ? zoomSlider.value -= (-10) : zoomSlider.value = 100;
     }
 
-    else if (click.target.className === "topView" && click.button == 0) {
+    else if (click.target.className === "btnTopView" && click.button == 0) {
       angleY = -1.6;
       angleX = 0;
     }
 
-    else if (click.target.className === "xView" && click.button == 0) {
+    else if (click.target.className === "btnXview" && click.button == 0) {
       angleY = 0;
       angleX = -1.6;
     }
 
-    else if (click.target.className === "yView" && click.button == 0) {
+    else if (click.target.className === "btnYview" && click.button == 0) {
       angleY = 0;
       angleX = 0;
     }
 
-    else if (click.target.className === "viewMode" && click.button == 0) {
+    else if (click.target.className === "btnViewMode" && click.button == 0) {
       let values = ["0xE3A2", "0xE22A", "0xE3F4"];
       let handleIndex = values.indexOf("0x" + click.target.value.charCodeAt(0).toString(16).toUpperCase()) + 1;
       if ((values.indexOf("0x" + click.target.value.charCodeAt(0).toString(16).toUpperCase()) + 1) >= values.length) handleIndex = 0;
@@ -343,7 +342,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
       (click.target.value !== String.fromCharCode("0xE628")) ? click.target.value = String.fromCharCode("0xE628") : click.target.value = String.fromCharCode("0xE627");
     }
 
-    else if (click.target.className === "litUnlit" && click.button == 0) {
+    else if (click.target.className === "btnLitUnlit" && click.button == 0) {
       (click.target.value !== String.fromCharCode("0xE25F")) ? click.target.value = String.fromCharCode("0xE25F") : click.target.value = String.fromCharCode("0xE90F");
     }
 
@@ -352,7 +351,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
       (click.target.value !== String.fromCharCode("0xE036")) ? click.target.value = String.fromCharCode("0xE036") : click.target.value = String.fromCharCode("0xE84D");
     }
 
-    else if (click.target.className === "close" && click.button == 0) {
+    else if (click.target.className === "btnClose" && click.button == 0) {
       click.target.parentElement.style.visibility = "hidden";
       click.target.parentElement.style.opacity = 0;
     }
