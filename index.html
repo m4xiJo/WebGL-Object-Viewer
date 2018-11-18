@@ -6,9 +6,10 @@
     <title>WebGL 3D Object Viewer</title>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css">
   </head>
-  <body onload="runWebGL()" oncontextmenu="return false;">
+  <body onload="runWebGL('fixtures/json/Suzanne/Susan.json', 'fixtures/json/Suzanne/textures/SusanTexture.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png')" oncontextmenu="return false;">
     <div class="workArea" class="workArea">
-      <div class="notification"><a>This is a notification area!</a></div>
+      <div class="notification"><a>Notification</a></div>
+      <div class="modal"><a class="title">Title</a><input class="close" type="button" value="&#xe5cd"><a class="content"><li>Doubles detected!</li><li>N-gon limit exceeding!</li></a></div>
       <div class="verticalPanelRight">
         <a class="FPS">0</a>
         <input class="topView" type="button" value="&#xe5db" name="Top View">
@@ -30,15 +31,7 @@
       </div>
       <canvas class="viewport">HTML5 is not supported, cannot draw a 3D viewport!</canvas>
     </div>
-    <img src="fixtures/sample/textures/crate1_diffuse.png" style="display:none;"></img>
     <script src="webgl/gl-matrix.js"></script> <!-- Load Matlib -->
     <script src="webgl/core.js"></script> <!-- Load WebGL Core -->
-    <!-- Load File Parsers -->
-    <script src="webgl/parsers/obj.js"></script>
-    <script src="webgl/parsers/dae.js"></script>
-    <script src="webgl/parsers/blend.js"></script>
-    <script src="webgl/parsers/3ds.js"></script>
-    <script src="webgl/parsers/fbx.js"></script>
-    <script src="webgl/parsers/max.js"></script>
   </body>
 </html>

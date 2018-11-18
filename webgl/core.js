@@ -1,92 +1,112 @@
-const allScripts = document.getElementsByTagName('script'); //Get all script paths
-const lastScript = allScripts[allScripts.length-1].src.split('?')[0].replace(/\/[\w\d\.]+\/[\w\d\.]+$/, ''); //Get the root path
+function runWebGL(meshPath, adPath, nbPath, smPath, grPath) {
 
-//Compile shaders
-var vShaderInstruct = [
-  "precision mediump float;",
-  "attribute vec3 vertPosition;",
-  "attribute vec2 vertTexCoord;",
-  "varying vec2 fragTexCoord;",
-  "uniform mat4 mWorld;",
-  "uniform mat4 mView;",
-  "uniform mat4 mProj;",
-  "void main() {",
-    "fragTexCoord = vertTexCoord;",
-    "gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);",
-  "}"].join("\n\r");
+  // Prepare Vertex shader
+  let vertexShader = [
+    "precision mediump float;",
+    "attribute vec3 vertPosition;",
+    "attribute vec2 vertTexCoord;",
+    "varying vec2 fragTexCoord;",
+    "uniform mat4 mWorld;",
+    "uniform mat4 mView;",
+    "uniform mat4 mProj;",
+    "void main() {",
+        "fragTexCoord = vertTexCoord;",
+        "gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);",
+    "}",
+  ].join("");
 
-var fShaderInstruct = [
-  "precision mediump float;",
-  "varying vec2 fragTexCoord;",
-  "uniform sampler2D sampler;",
-  "void main() {",
-    "gl_FragColor = texture2D(sampler, fragTexCoord);",
-  "}"].join("\n\r");
+  // Prepare Fragment shader
+  let fragmentShader = [
+    "precision mediump float;",
+    "varying vec2 fragTexCoord;",
+    "uniform sampler2D sampler;",
+    "void main() {",
+      "gl_FragColor = texture2D(sampler, fragTexCoord);",
+    "}",
+  ].join("");
 
-//Create a buffer
-var boxVertices = [
-  -1.0, 1.0, -1.0,   0, 0,
-  -1.0, 1.0, 1.0,    0, 1,
-  1.0, 1.0, 1.0,     1, 1,
-  1.0, 1.0, -1.0,    1, 0,
+  // Load Mesh
+  loadFile(meshPath, function(meshErr, meshObj) {
+    if (meshErr) console.error("Error getting mesh! " + meshErr);
+    else {
+      let meshVertex = meshObj.meshes[0].vertices;
+      let meshIndex = [].concat.apply([], meshObj.meshes[0].faces);
+      let texCoords  = meshObj.meshes[0].texturecoords[0];
+      // Load Albedo/Diffuse
+      loadFile(adPath, function(adErr, adObj) {
+        if (adErr) console.error("Error getting mesh Albedo/Diffuse! " + adErr);
+        else {
+          adPath = adObj;
+          // Load Normal/Bump
+          loadFile(nbPath, function(nbErr, nbObj) {
+            if (nbErr) console.error("Error getting mesh Normal/Bump map! " + nbErr + " Skipping...");
+            else nbPath = nbObj;
+          });
+          // Load Specular/Metallic
+          loadFile(smPath, function(smErr, smObj) {
+            if (smErr) console.error("Error getting mesh Specual/Metallic map! Skipping..." + smErr + " Skipping...");
+            else smPath = smObj;
+          });
+          // Load Glossy/Rough
+          loadFile(grPath, function(grErr, grObj) {
+            if (grErr) console.error("Error getting mesh Glossy/Roughness map! Skipping..." + grErr + " Skipping...");
+            else grPath = grObj;
+          });
+          execWebGL(vertexShader, fragmentShader, meshVertex, meshIndex, texCoords, adPath, nbPath, smPath, grPath);
+        }
+      });
+    }
+  });
+}
 
-  -1.0, 1.0, 1.0,    0, 0,
-  -1.0, -1.0, 1.0,   1, 0,
-  -1.0, -1.0, -1.0,  1, 1,
-  -1.0, 1.0, -1.0,   0, 1,
+// File loader
+function loadFile(url, callback) {
+  // Load mesh files
+  if (url.match(/\.(json|obj|dae|blend|fbx|3ds|max)/g)) {
+    let request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    if (url.match (/\.(json|obj|dae)/g)) { // If non binary asset
+      request.setRequestHeader("Content-Type", "text/plain");
+      request.onload = function () {
+        if (request.status < 200 || request.status > 299) callback("Error: Status " + request.status + " on resource " + url);
+        else callback(null, JSON.parse(request.responseText));
+      }
+    }
+    else if (url.match (/\.(blend|fbx|3ds|max)/g)) { // If binary asset
+      request.responseType = "arraybuffer";
+      request.onload = function () {
+        if (request.status < 200 || request.status > 299) callback("Error: Status " + request.status + " on resource " + url);
+        else callback(null, request.response);
+      }
+    }
+    request.send();
+  }
 
-  1.0, 1.0, 1.0,    1, 1,
-  1.0, -1.0, 1.0,   0, 1,
-  1.0, -1.0, -1.0,  0, 0,
-  1.0, 1.0, -1.0,   1, 0,
+  //Load textures
+  else if (url.match(/\.(jpg|jpeg|png|bmp|gif)/g)) {
+    let texture = new Image();
+    texture.onload = function () {
+      callback(null, texture);
+    }
+    texture.src = url;
+  }
+  else {
+      callback("Unreconginzed file format!");
+  }
+}
 
-  1.0, 1.0, 1.0,    1, 1,
-  1.0, -1.0, 1.0,    1, 0,
-  -1.0, -1.0, 1.0,    0, 0,
-  -1.0, 1.0, 1.0,    0, 1,
-
-  1.0, 1.0, -1.0,     0, 0,
-  1.0, -1.0, -1.0,     0, 1,
-  -1.0, -1.0, -1.0,    1, 1,
-  -1.0, 1.0, -1.0,      1, 0,
-
-  -1.0, -1.0, -1.0,   1, 1,
-  -1.0, -1.0, 1.0,    1, 0,
-  1.0, -1.0, 1.0,     0, 0,
-  1.0, -1.0, -1.0,    0, 1,
-];
-
-var boxIndices = [
-  0, 1, 2,
-  0, 2, 3,
-
-  5, 4, 6,
-  6, 4, 7,
-
-  8, 9, 10,
-  8, 10, 11,
-
-  13, 12, 14,
-  15, 14, 12,
-
-  16, 17, 18,
-  16, 18, 19,
-
-  21, 20, 22,
-  22, 20, 23
-];
-
-let runWebGL  = function () {
-  //Initialize WebGL
+function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshIndecies, meshTexCoords, texture_ad, texture_nb, texture_sm, texture_gr) {
+  //Initialize and configure WebGL
   let canvas = document.getElementsByClassName("viewport")[0];
   let gl = canvas.getContext("webgl");
 
   if (!gl) {
       console.log("WebGL is not supported, trying Experimental WebGL...");
       gl = canvas.getContext("experimental-webgl");
-      (!gl) ? alert("Couldn't initialize WebGL, this might be because your browser is doesn't support it!") : console.log("loaded Experimental WebGL!");
+      (!gl) ? alert("Couldn't initialize WebGL, this might be because your browser doesn't support it!") : console.log("loaded Experimental WebGL!");
   }
 
+  // Configure WebGL
   gl.clearColor(0.8, 0.8, 0.8, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.DEPTH_TEST);
@@ -94,24 +114,29 @@ let runWebGL  = function () {
   gl.frontFace(gl.CCW);
   gl.cullFace(gl.BACK);
 
+  // Create shaders
   let vertexShader = gl.createShader(gl.VERTEX_SHADER);
   let fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 
-  gl.shaderSource(vertexShader, vShaderInstruct);
-  gl.shaderSource(fragmentShader, fShaderInstruct);
+  //Define shader source
+  gl.shaderSource(vertexShader, vertexShaderCode);
+  gl.shaderSource(fragmentShader, fragmentShaderCode);
 
+  // Compile vertex shader
   gl.compileShader(vertexShader);
   if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
     console.error("ERROR failed to compile Vertex Shader", gl.getShaderInfoLog(vertexShader));
     return;
   }
 
+  // Compile fragment shader
   gl.compileShader(fragmentShader);
   if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
     console.error("ERROR failed to compile Fragment Shader", gl.getShaderInfoLog(fragmentShader));
     return;
   }
 
+  // Create program & validate it
   let program = gl.createProgram();
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
@@ -126,49 +151,34 @@ let runWebGL  = function () {
     return;
   }
 
-  let boxVertexBufferObj = gl.createBuffer(); //GPU buffer
-  gl.bindBuffer(gl.ARRAY_BUFFER, boxVertexBufferObj);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boxVertices), gl.STATIC_DRAW);
+  //GPU buffer
+  let meshVertexBufferObj = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, meshVertexBufferObj);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshVertecies), gl.STATIC_DRAW);
 
-  let boxIndexBufferObj = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, boxIndexBufferObj);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(boxIndices), gl.STATIC_DRAW);
+  let texCoordBufferObj = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBufferObj);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshTexCoords), gl.STATIC_DRAW);
 
+  let meshIndexBufferObj = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, meshIndexBufferObj);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(meshIndecies), gl.STATIC_DRAW);
+
+  //// Setup attributes ////
+  gl.bindBuffer(gl.ARRAY_BUFFER, meshVertexBufferObj);
   let posAttrLocation = gl.getAttribLocation(program, "vertPosition");
-  let texCoordAttrLocation = gl.getAttribLocation(program, "vertTexCoord");
-
-  gl.vertexAttribPointer(
-    posAttrLocation, // Location of attribute
-    3, // Number of elements per attribute
-    gl.FLOAT, // Type of elements
-    gl.FALSE, // Normalized?
-    5 * Float32Array.BYTES_PER_ELEMENT, // Size of individual vertex
-    0 // Offset from the beginning of a single vertex to this attribute
-  );
-
-  gl.vertexAttribPointer(
-    texCoordAttrLocation, // Location of attribute
-    2, // Number of elements per attribute
-    gl.FLOAT, // Type of elements
-    gl.FALSE, // Normalized?
-    5 * Float32Array.BYTES_PER_ELEMENT, // Size of individual vertex
-    3 * Float32Array.BYTES_PER_ELEMENT // Offset from the beginning of a single vertex to this attribute
-  );
-
+  // Location of attribute, Number of elements per attribute, Type of elements, Normalized?, Size of individual vertex, Offset from the beginning of a single vertex to this attribute
+  gl.vertexAttribPointer(posAttrLocation, 3, gl.FLOAT, gl.FALSE, 5 * Float32Array.BYTES_PER_ELEMENT, 0);
   gl.enableVertexAttribArray(posAttrLocation);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBufferObj);
+  let texCoordAttrLocation = gl.getAttribLocation(program, "vertTexCoord");
+  // Location of attribute, Number of elements per attribute, Type of elements, Normalized?, Size of individual vertex, Offset from the beginning of a single vertex to this attribute
+  gl.vertexAttribPointer(texCoordAttrLocation, 2, gl.FLOAT, gl.FALSE, 5 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
   gl.enableVertexAttribArray(texCoordAttrLocation);
 
-  var texture_d = new Image();
-  texture_d.src = lastScript + "/fixtures/sample/textures/crate1_diffuse.png";
-  var boxTexture = gl.createTexture(); // Create Texture
-  gl.bindTexture(gl.TEXTURE_2D, boxTexture);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_d);
-  gl.bindTexture(gl.TEXTURE_2D, null);
-  gl.useProgram(program); //Tell which program is active
+  //Tell which program is active
+  gl.useProgram(program);
 
   let matWorldUniformLocation = gl.getUniformLocation(program, "mWorld");
   let matViewUniformLocation = gl.getUniformLocation(program, "mView");
@@ -180,7 +190,7 @@ let runWebGL  = function () {
 
   mat4.identity(worldMatrix);
   mat4.lookAt(viewMatrix, [0, 0, -6], [0, 0, 0], [0, 1, 0]);
-  mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.clientWidth / canvas.clientHeight, 0.1, 1000.0);
+  mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.clientWidth / canvas.clientHeight, 1, 2000);
 
   gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
   gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
@@ -191,7 +201,7 @@ let runWebGL  = function () {
   let identityMatrix = new Float32Array(16);
   mat4.identity(identityMatrix);
 
-  //Global variables
+  //// Global variables ////
   let angleY = 0;
   let angleX = 0;
   let zoomRatio = 0;
@@ -213,7 +223,46 @@ let runWebGL  = function () {
     frameCounter = 0;
   };
 
-  //GUI Events
+  //// Create Textures ////
+  // Albedo/Diffuse
+  let meshTexture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, meshTexture);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_ad);
+  gl.bindTexture(gl.TEXTURE_2D, null);
+
+  // Normal/Bump
+
+  // Specular/Metallic
+
+  // Glossy/Rough
+
+  //// Render update loop ////
+  let updateLoop = function () {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
+    (autoRotate) ? angleX = performance.now() / 6000 * Math.PI : null;
+		mat4.rotate(yRotationMatrix, identityMatrix, angleX, [0, 1, 0]);
+		mat4.rotate(xRotationMatrix, identityMatrix, angleY, [1, 0, 0]);
+		mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
+    gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
+    gl.clearColor(0.8, 0.8, 0.8, 1.0);
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+    gl.bindTexture(gl.TEXTURE_2D, meshTexture);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.drawElements(gl.TRIANGLES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
+    currentTime = new Date().getTime();
+    fpsCounter.innerText = parseInt(frameCounter / (currentTime - startTime) * 1000);
+    frameCounter++;
+    requestAnimationFrame(updateLoop);
+  }
+  requestAnimationFrame(updateLoop);
+  //// GUI Events ////
   document.getElementsByClassName("viewport")[0].addEventListener('mousemove', inputMoveListen = function (move) {
     if (move.clientX && move.buttons == 1) {
       angleX += ((move.clientX - mouseMoveX) * 0.01)
@@ -303,11 +352,19 @@ let runWebGL  = function () {
       (click.target.value !== String.fromCharCode("0xE036")) ? click.target.value = String.fromCharCode("0xE036") : click.target.value = String.fromCharCode("0xE84D");
     }
 
+    else if (click.target.className === "close" && click.button == 0) {
+      click.target.parentElement.style.visibility = "hidden";
+      click.target.parentElement.style.opacity = 0;
+    }
+
     else if (click.target.classList[0] === "btnWarnings" && click.button == 0) {
       if (click.target.value !== String.fromCharCode("0xE86C")) {
         click.target.value = String.fromCharCode("0xE86C");
         click.target.classList.remove("error");
         click.target.classList.add("ok");
+        document.getElementsByClassName("modal")[0].style.visibility = "visible";
+        document.getElementsByClassName("modal")[0].style.opacity = 1;
+        document.getElementsByClassName("title")[0].innerText = "Mesh validation report";
       }
       else {
         click.target.value = String.fromCharCode("0xE002");
@@ -333,26 +390,29 @@ let runWebGL  = function () {
       }
     }
   }, false);
+}
 
-  // Render update loop
-  let updateLoop = function () {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
-    (autoRotate) ? angleX = performance.now() / 6000 * Math.PI : null;
-		mat4.rotate(yRotationMatrix, identityMatrix, angleX, [0, 1, 0]);
-		mat4.rotate(xRotationMatrix, identityMatrix, angleY, [1, 0, 0]);
-		mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
-    gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
-    gl.clearColor(0.8, 0.8, 0.8, 1.0);
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-    gl.bindTexture(gl.TEXTURE_2D, boxTexture);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
-    currentTime = new Date().getTime();
-    fpsCounter.innerText = parseInt(frameCounter / (currentTime - startTime) * 1000);
-    frameCounter++;
-    requestAnimationFrame(updateLoop);
-  }
-  requestAnimationFrame(updateLoop);
+//// Parsers ////
+function parse3DS() {
+
+}
+
+function parseBLEND() {
+
+}
+
+function parseDAE() {
+
+}
+
+function parseOBJ() {
+
+}
+
+function parseMAX() {
+
+}
+
+function parseFBX() {
+
 }

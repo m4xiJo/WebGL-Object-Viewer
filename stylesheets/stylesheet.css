@@ -12,15 +12,21 @@
       }
 
       body, input {font-family: Agency FB;}
+      li {list-style: none;}
+      li:before{content: "\e315"; font-family: Material Icons}
       .workArea {width: 640px; height: 480px; display: inline-block; position:relative; border: solid 1px #9e9e9e;}
       .viewport {z-index: 1;position: relative;height: 100%;width: 100%; transition: 0.2s}
       .viewport:hover {cursor: grab; box-shadow: black 0px 0px 8px;}
       .viewport:active {cursor: grabbing; box-shadow: black 0px 0px 8px;}
       .verticalPanelRight {z-index: 2; position: absolute; right: 3px; height: 100%;}
       .verticalPanelLeft {z-index: 2; position: absolute; left: 3px; height: 100%;}
-      .notification {position: absolute; z-index: 3; background: #30c375; color: white; width: 100%; border-bottom: 1px solid #249e5d; opacity: 0;}
-      .notification a {padding: 0px 8px 1px 8px; display: block;}
+      .notification {position: absolute; z-index: 3; background: #30c375; color: white; width: 100%; border-bottom: 1px solid #249e5d; display: none}
+      .modal {position: absolute; z-index: 3; color: white; width: 100%; opacity: 0; visibility: hidden; transition: visibility 0s, opacity 0.2s;}
+      .modal .title {padding: 0px 8px 1px 8px; display: block; background: #30c375; border-bottom: 1px solid #249e5d; font-weight: bold;}
+      .modal .content {padding: 4px 14px 4px 14px;; display: block; background: white; color: black; font-size: small; border-bottom: 1px solid #7e7e7e;}
+      .notification a, {padding: 0px 8px 1px 8px; display: block;}
       .notification:active {animation: fadein 1s;}
+      .close {top: 0; right: 0; margin: 0; padding: 0 !important; margin: 0 !important; position: absolute;}
       input[type=range][orient=vertical] {outline: 0; border: 0; padding: 0; -webkit-appearance: slider-vertical;  writing-mode: bt-lr; margin: 3px 0px 3px 0px; width: 20px; cursor: pointer; opacity: 0.4; transition: 0.2s}
       input[type=button], input[type=button]:focus {margin-top: 3px; border: 1px solid grey; outline: 0; padding: 1px 17px 0px 1px; display: block; width: 20px; cursor: pointer; opacity: 0.4; transition: 0.2s; font-family: Material Icons; font-size: 16px;}
       input[type=button]:hover, input[type=range]:hover {opacity: 1}
