@@ -226,9 +226,9 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   var ambLightIntensityUniformLocation = gl.getUniformLocation(program, "ambientLightIntensity");
   var sunlightDirUniformLocation = gl.getUniformLocation(program, "sun.direction");
   var sunlightIntUniformLocation = gl.getUniformLocation(program, "sun.color");
-  gl.uniform3f(ambLightIntensityUniformLocation, 0.2, 0.2, 0.2);
+  //gl.uniform3f(ambLightIntensityUniformLocation, 0.2, 0.2, 0.2);
   gl.uniform3f(sunlightDirUniformLocation, 3.0, 4.0, -2.0);
-  gl.uniform3f(sunlightIntUniformLocation, 1.0, 1.0, 1.0);
+  //gl.uniform3f(sunlightIntUniformLocation, 1.0, 1.0, 1.0);
 
   let identityMatrix = new Float32Array(16);
   mat4.identity(identityMatrix);
@@ -239,18 +239,20 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   let zoomRatio = 0;
   let mouseMoveX = 0;
   let mouseMoveY = 0;
-  let autoRotate = true;
   let fpsCounter = document.getElementsByClassName("FPS")[0];
   let startTime = new Date().getTime();
   let currentTime;
   let frameCounter = 0;
+
+  //States
   let isScrolling;
   let isMoving;
-  let viewGrid = true;
-  let lightingMode = 1;
-  let viewMode = 1;
 
   //Modes
+  let autoRotate = true;
+  let viewGrid = true;
+  let lightingMode = 1;
+  let viewMode = 2;
   let mapWorkflow = 1;
   let bumpNormal = 1;
   let shadingMode = 1;
@@ -283,7 +285,16 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
-    (autoRotate) ? angleX = performance.now() / 6000 * Math.PI : null;
+    if (autoRotate) angleX = performance.now() / 6000 * Math.PI;
+    if (lightingMode == 1) {
+      gl.uniform3f(ambLightIntensityUniformLocation, 0.2, 0.2, 0.2);
+      gl.uniform3f(sunlightIntUniformLocation, 1.0, 1.0, 1.0);
+    }
+    else {
+      gl.uniform3f(ambLightIntensityUniformLocation, 1.0, 1.0, 1.0);
+      gl.uniform3f(sunlightIntUniformLocation, 0.0, 0.0, 0.0);
+    }
+
 		mat4.rotate(yRotationMatrix, identityMatrix, angleX, [0, 1, 0]);
 		mat4.rotate(xRotationMatrix, identityMatrix, angleY, [1, 0, 0]);
 		mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
@@ -292,7 +303,9 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
     gl.bindTexture(gl.TEXTURE_2D, meshTexture);
     gl.activeTexture(gl.TEXTURE0);
-    gl.drawElements(gl.TRIANGLES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
+    if (viewMode == 0) gl.drawElements(gl.TRIANGLES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
+    else if (viewMode == 1) gl.drawElements(gl.LINES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
+    else if (viewMode == 2) gl.drawElements(gl.TRIANGLES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
     currentTime = new Date().getTime();
     fpsCounter.innerText = parseInt(frameCounter / (currentTime - startTime) * 1000);
     frameCounter++;
@@ -368,48 +381,55 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     }
 
     else if (click.target.className === "btnTopView" && click.button == 0) {
+      showNotification("Top view", 1, "red");
       angleY = -1.6;
       angleX = 0;
     }
 
     else if (click.target.className === "btnXview" && click.button == 0) {
+      showNotification("Front view", 1, "red");
       angleY = 0;
       angleX = -1.6;
     }
 
     else if (click.target.className === "btnYview" && click.button == 0) {
+      showNotification("Side view", 1, "red");
       angleY = 0;
       angleX = 0;
     }
 
     else if (click.target.className === "btnViewMode" && click.button == 0) {
-      let values = ["0xE3A2", "0xE22A", "0xE3F4"];
-      let handleIndex = values.indexOf("0x" + click.target.value.charCodeAt(0).toString(16).toUpperCase()) + 1;
-      if ((values.indexOf("0x" + click.target.value.charCodeAt(0).toString(16).toUpperCase()) + 1) >= values.length) handleIndex = 0;
-      switch (handleIndex) {
+      switch (viewMode) {
         case 0:
-          click.target.value = String.fromCharCode("0xE3A2");
-          showNotification("Solid view", 1, "red");
-          break;
-        case 1:
           click.target.value = String.fromCharCode("0xE22A");
           showNotification("Wireframe view", 1, "red");
+          viewMode = 1;
           break;
-        case 2:
+        case 1:
           click.target.value = String.fromCharCode("0xE3F4");
           showNotification("Textured view", 1, "red");
+          viewMode = 2;
+          break;
+        case 2:
+          click.target.value = String.fromCharCode("0xE3A2");
+          showNotification("Solid view", 1, "red");
+          viewMode = 0;
           break;
       }
     }
 
+
+
     else if (click.target.className === "btnGrid" && click.button == 0) {
-      if (click.target.value !== String.fromCharCode("0xE3EB")) {
+      if (viewGrid == true) {
         click.target.value = String.fromCharCode("0xE3EB")
         showNotification("Grid OFF", 1, "red");
+        viewGrid = false;
       }
-      else {
+      else if (viewGrid == false) {
         click.target.value = String.fromCharCode("0xE3EC");
         showNotification("Grid ON", 1, "red");
+        viewGrid = true;
       }
     }
 
@@ -418,25 +438,29 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     }
 
     else if (click.target.className === "btnLitUnlit" && click.button == 0) {
-      if (click.target.value !== String.fromCharCode("0xE25F")) {
+      if (lightingMode == 0) {
         click.target.value = String.fromCharCode("0xE25F");
         showNotification("Set to Lit mode", 1, "red");
+        lightingMode = 1;
       }
-      else {
+      else if (lightingMode == 1) {
         click.target.value = String.fromCharCode("0xE90F");
         showNotification("Set to Unlit mode", 1, "red");
+        lightingMode = 0;
       }
     }
 
     else if (click.target.className === "btnRotation" && click.button == 0) {
-      autoRotate ^= true;
-      if (click.target.value !== String.fromCharCode("0xE036")) {
+
+      if (autoRotate == true) {
         click.target.value = String.fromCharCode("0xE036");
         showNotification("Auto 3D Rotation stopped", 1, "red");
+        autoRotate = false;
       }
-      else {
+      else if (autoRotate == false) {
         click.target.value = String.fromCharCode("0xE84D");
         showNotification("Auto 3D Rotation resumed", 1, "red");
+        autoRotate = true;
       }
     }
 
