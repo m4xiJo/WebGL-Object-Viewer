@@ -1,3 +1,6 @@
+var helpTextLoremIpsum = "<p>Ea paulo intellegat omittantur sit, esse liber at qui, vix cu ludus volutpat. Cibo dicit nonumes has et, his ne lorem scripta scriptorem, sea ex oblique deseruisse argumentum. Eu dolorum consequuntur quo. Nonumy omnium pri ea. </p><p>Est ex recusabo delicata, imperdiet concludaturque id est. Option conclusionemque ne mei. Ex eam accumsan inimicus. Has nominavi voluptatum complectitur ad. Libris nemore ad qui, te his probo utroque. Eu meliore admodum eum. </p><p>Cu option feugiat dolorem per, per an tale legere. Oporteat vulputate cu eos, sonet virtute no mel. Eos altera animal oporteat et, id perfecto interpretaris qui. Putent dicunt maiorum an has, et duo atqui animal eligendi. Sale tamquam pericula quo eu, nostrud intellegat an est, ea usu vitae nominati. Dicam vocent dolorem pro ut, ea per iudico minimum, an simul aperiam malorum ius. Ei pro facer tritani, quodsi accusata eu qui. </p><p>Te mel dicant scribentur theophrastus, vis falli postulant constituam ad. Cum eu mnesarchum instructior. Malis putent petentium pro in, an est senserit elaboraret intellegebat, mei in mollis mediocritatem. Ad eum illud fugit. In suas homero nemore his. </p><p>Pro illum aliquip in, pri et affert iracundia. Simul melius nostrum eum ei, simul nostro invidunt qui in, ei omnium latine omittam duo. Pri an dicant lucilius aliquando, brute feugait adolescens pri eu, vel cu fabulas pertinacia. Mea noster delectus dignissim et, est ea illum intellegat. Epicurei philosophia id vim. </p><p>Oratio insolens ullamcorper ex has, ad ius solet ignota reprehendunt. Duo petentium erroribus at, quem nostrum ad his. Nam omnis posidonium ne, partem vocibus pri an, ius no nominati gubergren. Verear recteque philosophia ius cu, ad oblique propriae vel. </p><p>Vel dolor legendos salutandi et, vitae primis inimicus sed an. Ad sed omnis iracundia, facer nonumy saperet eu nec. Cu signiferumque mediocritatem vix. Vis id erant possim. In pro quidam labores. Ei sit oblique atomorum honestatis, quo mazim delicata cu, cu nibh graeci facilisi duo. </p><p>Ei vix magna malorum nominati. Hinc indoctum repudiare cu vix. Graeco vocent deseruisse nam eu. Ea cum suscipit elaboraret. At nulla tincidunt pri. </p><p>Ex pro consul sanctus, ea ullum ancillae facilisis pri. Ex pro quaeque honestatis, eam ad zril dictas, mei ponderum disputando id. Liber adversarium est te. Cibo impetus reprimique no quo, id eos viderer honestatis. Amet platonem consulatu ei cum, omnis assum eu est, vel cu suscipit facilisi. </p><p>Sea congue denique no, persius scaevola vel ne. Ut sit eius illum accusam, at volutpat abhorreant scriptorem per. Periculis theophrastus nec te, eam id commune omnesque, ius at mutat volumus nostrum. Vim stet impetus instructior ea, mei ea viderer torquatos. Et vero dicat timeam vis.</p>";
+
+
 function runWebGL(meshPath, adPath, nbPath, smPath, grPath) {
   // Prepare Vertex shader
   let vertexShader = [
@@ -22,8 +25,7 @@ function runWebGL(meshPath, adPath, nbPath, smPath, grPath) {
     "precision mediump float;",
     "struct directionalLight {",
       "vec3 direction;",
-      "vec3 color;",
-    "};",
+      "vec3 color;};",
     "varying vec2 fragTexCoord;",
     "varying vec3 fragNormal;",
     "uniform vec3 ambientLightIntensity;",
@@ -211,7 +213,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   let worldMatrix = new Float32Array(16);
 
   mat4.identity(worldMatrix);
-  mat4.lookAt(viewMatrix, [0, 0, -4], [0, 0, 0], [0, 1, 0]);
+  mat4.lookAt(viewMatrix, [0, 0, -200], [0, 0, 0], [0, 1, 0]);
   mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.clientWidth / canvas.clientHeight, 1, 2000);
 
   gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
@@ -503,8 +505,11 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     }
 
     else if (click.target.className === "btnHelp" && click.button == 0) {
-      toggleModalWindow("Help menu", "<b>Coming soon!</b>", "red");
+      toggleModalWindow("Help menu", "<b>Coming soon!</b>\n" + helpTextLoremIpsum, "red");
     }
+
+
+
 
     else if (click.target.classList[0] === "btnWarnings" && click.button == 0) {
       if (click.target.value !== String.fromCharCode("0xE86C")) {

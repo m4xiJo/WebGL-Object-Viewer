@@ -6,7 +6,7 @@
     <title>WebGL 3D Object Viewer</title>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css">
   </head>
-  <body onload="runWebGL('fixtures/json/Suzanne/Suzanne.json', 'fixtures/json/Suzanne/textures/Suzanne_tex.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png')" oncontextmenu="return false;">
+  <body onload="runWebGL('fixtures/json/Teapots/Teapot.json', 'fixtures/json/Teapot/textures/ceramic.jpg', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png')" oncontextmenu="return false;">
     <div class="workArea" class="workArea">
       <div class="notification"><a class="notyTitle">Notification</a></div>
       <div class="modal"><a class="modalTitle">Title</a><input class="btnClose" type="button" value="&#xe5cd"><a class="modalContent"></a></div>
@@ -35,6 +35,11 @@
       </div>
       <canvas class="viewport">HTML5 is not supported, cannot draw a 3D viewport!</canvas>
     </div>
+    <br>
+    <input type="button" value="Load ze Teapot!" name="Load ze Teapot!" style="font-family: Agency FB; width: auto; display: inline">
+    <input type="button" value="Load ze Monkey!" name="Load ze Monkey!" style="font-family: Agency FB; width: auto; display: inline">
+    <input type="button" value="Load ze Car!" name="Load ze Car!" style="font-family: Agency FB; width: auto; display: inline">
+    <input type="button" value="Load ze House!" name="Load ze House!" style="font-family: Agency FB; width: auto; display: inline">
     <script src="webgl/gl-matrix.js"></script> <!-- Load Matlib -->
     <script src="webgl/core.js"></script> <!-- Load WebGL Core -->
   </body>
