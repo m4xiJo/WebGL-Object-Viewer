@@ -250,6 +250,11 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   let lightingMode = 1;
   let viewMode = 1;
 
+  //Modes
+  let mapWorkflow = 1;
+  let bumpNormal = 1;
+  let shadingMode = 1;
+
   window.onfocus = function() {
     startTime = new Date().getTime();
     frameCounter = 0;
@@ -295,6 +300,33 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   }
   requestAnimationFrame(updateLoop);
   //// GUI Events ////
+
+  //Show notification
+  function showNotification(text, time, color) {
+    let timeOut = null;
+    if (timeOut != null) clearTimeout(timeOut);
+    document.getElementsByClassName("notyTitle")[0].innerText = text;
+    document.getElementsByClassName("notification")[0].style.animation = "fadein " + time + "s";
+    timeOut = setTimeout(function() {
+      document.getElementsByClassName("notification")[0].style.animation = null;
+    }, time * 1000);
+  }
+
+  function toggleModalWindow (title, content, color) {
+    if (document.getElementsByClassName("modal")[0].style.visibility !== "visible") {
+      document.getElementsByClassName("modal")[0].style.visibility = "visible";
+      document.getElementsByClassName("modal")[0].style.opacity = 1;
+      document.getElementsByClassName("modalTitle")[0].innerText = title;
+      document.getElementsByClassName("modalContent")[0].innerHTML = content;
+    }
+    else {
+      document.getElementsByClassName("modal")[0].style.visibility = "hidden";
+      document.getElementsByClassName("modal")[0].style.opacity = 0;
+      document.getElementsByClassName("modalTitle")[0].innerText = null;
+      document.getElementsByClassName("modalContent")[0].innerHTML = null;
+    }
+  }
+
   document.getElementsByClassName("viewport")[0].addEventListener('mousemove', inputMoveListen = function (move) {
     if (move.clientX && move.buttons == 1) {
       angleX += ((move.clientX - mouseMoveX) * 0.01)
@@ -357,18 +389,28 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
       switch (handleIndex) {
         case 0:
           click.target.value = String.fromCharCode("0xE3A2");
+          showNotification("Solid view", 1, "red");
           break;
         case 1:
           click.target.value = String.fromCharCode("0xE22A");
+          showNotification("Wireframe view", 1, "red");
           break;
         case 2:
           click.target.value = String.fromCharCode("0xE3F4");
+          showNotification("Textured view", 1, "red");
           break;
       }
     }
 
     else if (click.target.className === "btnGrid" && click.button == 0) {
-      (click.target.value !== String.fromCharCode("0xE3EB")) ? click.target.value = String.fromCharCode("0xE3EB") : click.target.value = String.fromCharCode("0xE3EC");
+      if (click.target.value !== String.fromCharCode("0xE3EB")) {
+        click.target.value = String.fromCharCode("0xE3EB")
+        showNotification("Grid OFF", 1, "red");
+      }
+      else {
+        click.target.value = String.fromCharCode("0xE3EC");
+        showNotification("Grid ON", 1, "red");
+      }
     }
 
     else if (click.target.className === "btnSyncViewport" && click.button == 0) {
@@ -376,17 +418,68 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     }
 
     else if (click.target.className === "btnLitUnlit" && click.button == 0) {
-      (click.target.value !== String.fromCharCode("0xE25F")) ? click.target.value = String.fromCharCode("0xE25F") : click.target.value = String.fromCharCode("0xE90F");
+      if (click.target.value !== String.fromCharCode("0xE25F")) {
+        click.target.value = String.fromCharCode("0xE25F");
+        showNotification("Set to Lit mode", 1, "red");
+      }
+      else {
+        click.target.value = String.fromCharCode("0xE90F");
+        showNotification("Set to Unlit mode", 1, "red");
+      }
     }
 
     else if (click.target.className === "btnRotation" && click.button == 0) {
       autoRotate ^= true;
-      (click.target.value !== String.fromCharCode("0xE036")) ? click.target.value = String.fromCharCode("0xE036") : click.target.value = String.fromCharCode("0xE84D");
+      if (click.target.value !== String.fromCharCode("0xE036")) {
+        click.target.value = String.fromCharCode("0xE036");
+        showNotification("Auto 3D Rotation stopped", 1, "red");
+      }
+      else {
+        click.target.value = String.fromCharCode("0xE84D");
+        showNotification("Auto 3D Rotation resumed", 1, "red");
+      }
     }
 
     else if (click.target.className === "btnClose" && click.button == 0) {
       click.target.parentElement.style.visibility = "hidden";
       click.target.parentElement.style.opacity = 0;
+    }
+
+    else if (click.target.className === "btnWorkflow" && click.button == 0) {
+      if (mapWorkflow == 1) {
+        mapWorkflow = 2;
+        showNotification("Swithed to: Diffuse, Specular, Glossy workflow", 2, "red");
+      }
+      else if (mapWorkflow == 2) {
+        mapWorkflow = 1;
+        showNotification("Swithed to: Albedo, Metallic, Roughness workflow", 2, "red");
+      }
+    }
+
+    else if (click.target.className === "btnShading" && click.button == 0) {
+      if (shadingMode == 1) {
+        shadingMode = 2;
+        showNotification("Swithed to flat shading", 2, "red");
+      }
+      else if (shadingMode == 2) {
+        shadingMode = 1;
+        showNotification("Swithed to smooth shading", 2, "red");
+      }
+    }
+
+    else if (click.target.className === "btnBumpNormal" && click.button == 0) {
+      if (bumpNormal == 1) {
+        bumpNormal = 2;
+        showNotification("Swithed to bump maps", 2, "red");
+      }
+      else if (bumpNormal == 2) {
+        bumpNormal = 1;
+        showNotification("Swithed to normal maps", 2, "red");
+      }
+    }
+
+    else if (click.target.className === "btnHelp" && click.button == 0) {
+      toggleModalWindow("Help menu", "<b>Coming soon!</b>", "red");
     }
 
     else if (click.target.classList[0] === "btnWarnings" && click.button == 0) {
@@ -400,9 +493,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
         click.target.classList.remove("ok");
         click.target.classList.add("error");
       }
-      document.getElementsByClassName("modal")[0].style.visibility = "visible";
-      document.getElementsByClassName("modal")[0].style.opacity = 1;
-      document.getElementsByClassName("title")[0].innerText = "Mesh validation report";
+      toggleModalWindow("Mesh validation report", "<b>The list bellow is just a placeholder!</b><li>Doubles detected!</li><li>N-gon limit exceeding!</li>", "red");
     }
 
     else if (click.target.className === "btnFullScreen" && click.button == 0) {
@@ -423,6 +514,8 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     }
   }, false);
 }
+
+
 
 //// Parsers ////
 function parse3DS() {

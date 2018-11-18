@@ -8,8 +8,8 @@
   </head>
   <body onload="runWebGL('fixtures/json/Suzanne/Susan.json', 'fixtures/json/Suzanne/textures/SusanTexture.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png')" oncontextmenu="return false;">
     <div class="workArea" class="workArea">
-      <div class="notification"><a>Notification</a></div>
-      <div class="modal"><a class="title">Title</a><input class="btnClose" type="button" value="&#xe5cd"><a class="content"><li>Doubles detected!</li><li>N-gon limit exceeding!</li></a></div>
+      <div class="notification"><a class="notyTitle">Notification</a></div>
+      <div class="modal"><a class="modalTitle">Title</a><input class="btnClose" type="button" value="&#xe5cd"><a class="modalContent"></a></div>
       <div class="verticalPanelRight">
         <a class="FPS">0</a>
         <input class="btnTopView" type="button" value="&#xe5db" name="Top View">
@@ -26,7 +26,11 @@
         <input class="btnViewMode" type="button" value="&#xe3a2" name="Toggle Solid/Wireframe/Texture">
         <input class="btnGrid" type="button" value="&#xe3ec" name="Toggle Grid">
         <input class="btnRotation" type="button" value="&#xe84d" name="Toggle Auto Rotation">
+        <input class="btnWorkflow" type="button" value="&#xe55b" name="Toggle between Albedo, Metallic, Roughness & Diffuse, Specular, Glossy workflow">
+        <input class="btnBumpNormal" type="button" value="&#xe80b" name="Toggle between bump and normal">
+        <input class="btnShading" type="button" value="&#xe3a5" name="Toggle shading between flat and smooth">
         <input class="btnSyncViewport" type="button" value="&#xe627" name="Sync Viewpors (only if multiple)" disabled>
+        <input class="btnHelp" type="button" value="&#xe8fd" name="Open help">
         <input class="btnWarnings error" type="button" value="&#xe002" name="Warning list">
       </div>
       <canvas class="viewport">HTML5 is not supported, cannot draw a 3D viewport!</canvas>

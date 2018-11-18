@@ -20,10 +20,10 @@
       .viewport:active {cursor: grabbing; box-shadow: black 0px 0px 8px}
       .verticalPanelRight {z-index: 2; position: absolute; right: 3px; height: 100%}
       .verticalPanelLeft {z-index: 2; position: absolute; left: 3px; height: 100%}
-      .notification {position: absolute; z-index: 3; background: #30c375; color: white; width: 100%; border-bottom: 1px solid #249e5d; display: none}
-      .modal {position: absolute; z-index: 3; color: white; width: 100%; opacity: 0; visibility: hidden; transition: visibility 0s, opacity 0.2s}
-      .modal .title {padding: 0px 8px 1px 8px; display: block; background: #30c375; border-bottom: 1px solid #249e5d; font-weight: bold}
-      .modal .content {padding: 4px 14px 4px 14px;; display: block; background: white; color: black; font-size: small; border-bottom: 1px solid #7e7e7e}
+      .notification {position: absolute; z-index: 3; background: #30c375; color: white; width: 100%; border-bottom: 1px solid #249e5d; opacity: 0; visibility: hidden}
+      .modal {position: absolute; z-index: 3; color: white; width: 100%; opacity: 0; visibility: hidden; animation: transition 1s}
+      .modalTitle {padding: 0px 8px 1px 8px; display: block; background: #30c375; border-bottom: 1px solid #249e5d; font-weight: bold}
+      .modalContent {padding: 4px 14px 4px 14px;; display: block; background: white; color: black; font-size: small; border-bottom: 1px solid #7e7e7e}
       .notification a, {padding: 0px 8px 1px 8px; display: block}
       .notification:active {animation: fadein 1s}
       .btnClose {top: 0; right: 0; margin: 0; padding: 0 !important; margin: 0 !important; position: absolute}
@@ -32,13 +32,13 @@
       input[type=button]:hover, input[type=range]:hover {opacity: 1}
       input[type="button"]:disabled {cursor: no-drop}
       input::-moz-focus-inner {border: 0; outline: 0;}
-      .FPS {text-shadow: 0px 0px 3px black; color: white; font-weight: normal; font-size: small; display: block; text-align: right}
-      .stats {text-shadow: 0px 0px 3px black; color: white; font-weight: normal; font-size: small; display: block; text-align: left}
+      .FPS {text-shadow: 0px 0px 3px black; color: white; font-weight: normal; font-size: medium; display: block; text-align: right}
+      .stats {text-shadow: 0px 0px 3px black; color: white; font-weight: normal; font-size: medium; display: block; text-align: left}
       .btnWarnings.error {color: #b90000}
       .btnWarnings.ok {color: green}
       .btnFullScreen {bottom: 3px; position: absolute}
       .btnWarnings {bottom: 3px; position: absolute}
-      @keyframes fadein {0% {opacity: 0} 10% {opacity: 1} 90% {opacity: 1} 100% {opacity: 0}}
-      @-moz-keyframes fadein {0% {opacity: 1} 10% {opacity: 1} 90% {opacity: 1} 100% {opacity: 0}}
-      @-webkit-keyframes fadein {0% {opacity: 1} 10% {opacity: 1} 90% {opacity: 1} 100% {opacity: 0}}
+      @keyframes fadein {0% {opacity: 0; visibility: hidden} 10% {opacity: 1; visibility: visible} 90% {opacity: 1; visibility: visible} 100% {opacity: 0; visibility: hidden}}
+      @-moz-keyframes fadein {0% {opacity: 1; visibility: hidden} 10% {opacity: 1; visibility: visible} 90% {opacity: 1; visibility: visible} 100% {opacity: 0; visibility: hidden}}
+      @-webkit-keyframes fadein {0% {opacity: 1; visibility: hidden} 10% {opacity: 1; visibility: visible} 90% {opacity: 1; visibility: visible} 100% {opacity: 0; visibility: hidden}}
       @-ms-keyframes fadein {0% {opacity: 1} 10% {opacity: 1} 90% {opacity: 1} 100% {opacity: 0}}
