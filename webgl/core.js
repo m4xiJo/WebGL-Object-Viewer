@@ -4,12 +4,15 @@ function runWebGL(meshPath, adPath, nbPath, smPath, grPath) {
     "precision mediump float;",
     "attribute vec3 vertPosition;",
     "attribute vec2 vertTexCoord;",
+    "attribute vec3 vertNormal;",
     "varying vec2 fragTexCoord;",
+    "varying vec3 fragNormal;",
     "uniform mat4 mWorld;",
     "uniform mat4 mView;",
     "uniform mat4 mProj;",
     "void main() {",
         "fragTexCoord = vertTexCoord;",
+        "fragNormal = (mWorld * vec4(vertNormal, 0.0)).xyz;",
         "gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);",
     "}",
   ].join("");
@@ -17,10 +20,21 @@ function runWebGL(meshPath, adPath, nbPath, smPath, grPath) {
   // Prepare Fragment shader
   let fragmentShader = [
     "precision mediump float;",
+    "struct directionalLight {",
+      "vec3 direction;",
+      "vec3 color;",
+    "};",
     "varying vec2 fragTexCoord;",
+    "varying vec3 fragNormal;",
+    "uniform vec3 ambientLightIntensity;",
+    "uniform directionalLight sun;",
     "uniform sampler2D sampler;",
     "void main() {",
-      "gl_FragColor = texture2D(sampler, fragTexCoord);",
+      "vec3 surfaceNormal = normalize(fragNormal);",
+      "vec3 normSunDir = normalize(sun.direction);",
+      "vec4 texel = texture2D (sampler, fragTexCoord);",
+      "vec3 lightIntensity = ambientLightIntensity + sun.color * max(dot(fragNormal, normSunDir), 0.0);",
+      "gl_FragColor = vec4(texel.rgb * lightIntensity, texel.a);",
     "}",
   ].join("");
 
@@ -30,7 +44,8 @@ function runWebGL(meshPath, adPath, nbPath, smPath, grPath) {
     else {
       let meshVertex = meshObj.meshes[0].vertices;
       let meshIndex = [].concat.apply([], meshObj.meshes[0].faces);
-      let texCoords  = meshObj.meshes[0].texturecoords[0];
+      let meshTexCoords  = meshObj.meshes[0].texturecoords[0];
+      let meshNormals = meshObj.meshes[0].normals;
       // Load Albedo/Diffuse
       loadFile(adPath, function(adErr, adObj) {
         if (adErr) console.error("Error getting mesh Albedo/Diffuse! " + adErr);
@@ -51,7 +66,7 @@ function runWebGL(meshPath, adPath, nbPath, smPath, grPath) {
             if (grErr) console.error("Error getting mesh Glossy/Roughness map! Skipping..." + grErr + " Skipping...");
             else grPath = grObj;
           });
-          execWebGL(vertexShader, fragmentShader, meshVertex, meshIndex, texCoords, adPath, nbPath, smPath, grPath);
+          execWebGL(vertexShader, fragmentShader, meshVertex, meshIndex, meshTexCoords, meshNormals, adPath, nbPath, smPath, grPath);
         }
       });
     }
@@ -94,7 +109,7 @@ function loadFile(url, callback) {
   }
 }
 
-function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshIndecies, meshTexCoords, texture_ad, texture_nb, texture_sm, texture_gr) {
+function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshIndecies, meshTexCoords, meshNormals, texture_ad, texture_nb, texture_sm, texture_gr) {
   //Initialize and configure WebGL
   let canvas = document.getElementsByClassName("viewport")[0];
   let gl = canvas.getContext("webgl");
@@ -150,7 +165,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     return;
   }
 
-  //GPU buffer
+  // GPU buffer
   let meshVertexBufferObj = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, meshVertexBufferObj);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshVertecies), gl.STATIC_DRAW);
@@ -163,20 +178,28 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, meshIndexBufferObj);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(meshIndecies), gl.STATIC_DRAW);
 
+  let meshNormalBufferObj = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, meshNormalBufferObj);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshNormals), gl.STATIC_DRAW);
+
   //// Setup attributes ////
+  // Location of attribute, Number of elements per attribute, Type of elements, Normalized?, Size of individual vertex, Offset from the beginning of a single vertex to this attribute
   gl.bindBuffer(gl.ARRAY_BUFFER, meshVertexBufferObj);
   let posAttrLocation = gl.getAttribLocation(program, "vertPosition");
-  // Location of attribute, Number of elements per attribute, Type of elements, Normalized?, Size of individual vertex, Offset from the beginning of a single vertex to this attribute
   gl.vertexAttribPointer(posAttrLocation, 3, gl.FLOAT, gl.FALSE, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
   gl.enableVertexAttribArray(posAttrLocation);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBufferObj);
   let texCoordAttrLocation = gl.getAttribLocation(program, "vertTexCoord");
-  // Location of attribute, Number of elements per attribute, Type of elements, Normalized?, Size of individual vertex, Offset from the beginning of a single vertex to this attribute
   gl.vertexAttribPointer(texCoordAttrLocation, 2, gl.FLOAT, gl.FALSE, 2 * Float32Array.BYTES_PER_ELEMENT, 0);
   gl.enableVertexAttribArray(texCoordAttrLocation);
 
-  //Tell which program is active
+  gl.bindBuffer(gl.ARRAY_BUFFER, meshNormalBufferObj);
+  let normalAttrLocation = gl.getAttribLocation(program, "vertNormal");
+  gl.vertexAttribPointer(normalAttrLocation, 3, gl.FLOAT, gl.TRUE, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
+  gl.enableVertexAttribArray(normalAttrLocation);
+
+  // Tell which program is active
   gl.useProgram(program);
 
   let matWorldUniformLocation = gl.getUniformLocation(program, "mWorld");
@@ -188,7 +211,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   let worldMatrix = new Float32Array(16);
 
   mat4.identity(worldMatrix);
-  mat4.lookAt(viewMatrix, [0, 0, -6], [0, 0, 0], [0, 1, 0]);
+  mat4.lookAt(viewMatrix, [0, 0, -4], [0, 0, 0], [0, 1, 0]);
   mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.clientWidth / canvas.clientHeight, 1, 2000);
 
   gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
@@ -197,6 +220,16 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
 
   let xRotationMatrix = new Float32Array(16);
   let yRotationMatrix = new Float32Array(16);
+
+  // Lighting
+  gl.useProgram(program);
+  var ambLightIntensityUniformLocation = gl.getUniformLocation(program, "ambientLightIntensity");
+  var sunlightDirUniformLocation = gl.getUniformLocation(program, "sun.direction");
+  var sunlightIntUniformLocation = gl.getUniformLocation(program, "sun.color");
+  gl.uniform3f(ambLightIntensityUniformLocation, 0.2, 0.2, 0.2);
+  gl.uniform3f(sunlightDirUniformLocation, 3.0, 4.0, -2.0);
+  gl.uniform3f(sunlightIntUniformLocation, 1.0, 1.0, 1.0);
+
   let identityMatrix = new Float32Array(16);
   mat4.identity(identityMatrix);
 
