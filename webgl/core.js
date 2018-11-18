@@ -64,7 +64,7 @@ function loadFile(url, callback) {
   // Load mesh files
   if (url.match(/\.(json|obj|dae|blend|fbx|3ds|max)/g)) {
     let request = new XMLHttpRequest();
-    request.open('GET', url, true);
+    request.open('GET', url + "?" + Math.random(), true);
     if (url.match (/\.(json|obj|dae)/g)) { // If non binary asset
       request.setRequestHeader("Content-Type", "text/plain");
       request.onload = function () {
