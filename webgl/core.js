@@ -361,15 +361,15 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
         click.target.value = String.fromCharCode("0xE86C");
         click.target.classList.remove("error");
         click.target.classList.add("ok");
-        document.getElementsByClassName("modal")[0].style.visibility = "visible";
-        document.getElementsByClassName("modal")[0].style.opacity = 1;
-        document.getElementsByClassName("title")[0].innerText = "Mesh validation report";
       }
       else {
         click.target.value = String.fromCharCode("0xE002");
         click.target.classList.remove("ok");
         click.target.classList.add("error");
       }
+      document.getElementsByClassName("modal")[0].style.visibility = "visible";
+      document.getElementsByClassName("modal")[0].style.opacity = 1;
+      document.getElementsByClassName("title")[0].innerText = "Mesh validation report";
     }
 
     else if (click.target.className === "btnFullScreen" && click.button == 0) {
