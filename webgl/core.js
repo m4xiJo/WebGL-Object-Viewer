@@ -314,24 +314,34 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     requestAnimationFrame(updateLoop);
   }
   requestAnimationFrame(updateLoop);
-  //// GUI Events ////
 
+  //// GUI Events ////
   //Show notification
-  function showNotification(text, time, color) {
-    let timeOut = null;
-    if (timeOut != null) clearTimeout(timeOut);
+  // Colors
+  let normal = "#5c5c5c";
+  let success = "#036f00";
+  let warning = "#808d00";
+  let error = "#ba0000";
+  let timer = null;
+
+  function showNotification(text, time, color, percent, timeOut) {
+    clearTimeout(timer);
     document.getElementsByClassName("notyTitle")[0].innerText = text;
     document.getElementsByClassName("notification")[0].style.animation = "fadein " + time + "s";
-    timeOut = setTimeout(function() {
+    document.getElementsByClassName("notification")[0].style.background = color;
+    document.getElementsByClassName("notification")[0].style.borderBottom = "1px solid" + modifyColor(color, percent);
+    timer = setTimeout(function() {
       document.getElementsByClassName("notification")[0].style.animation = null;
     }, time * 1000);
   }
 
-  function toggleModalWindow (title, content, color) {
+  function toggleModalWindow (title, content, color, percent) {
     if (document.getElementsByClassName("modal")[0].style.visibility !== "visible") {
       document.getElementsByClassName("modal")[0].style.visibility = "visible";
       document.getElementsByClassName("modal")[0].style.opacity = 1;
       document.getElementsByClassName("modalTitle")[0].innerText = title;
+      document.getElementsByClassName("modalTitle")[0].style.background = color;
+      document.getElementsByClassName("modalTitle")[0].style.borderBottom = "1px solid" + modifyColor(color, percent);
       document.getElementsByClassName("modalContent")[0].innerHTML = content;
     }
     else {
@@ -340,6 +350,16 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
       document.getElementsByClassName("modalTitle")[0].innerText = null;
       document.getElementsByClassName("modalContent")[0].innerHTML = null;
     }
+  }
+
+  function modifyColor (color, percent) {
+      if (color.match(/#/g)) color = color.replace('#','');
+    	let num = parseInt(color, 16),
+  		amt = Math.round(2.55 * percent),
+  		R = (num >> 16) + amt,
+  		B = (num >> 8 & 0x00FF) + amt,
+  		G = (num & 0x0000FF) + amt;
+  		return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
   }
 
   document.getElementsByClassName("viewport")[0].addEventListener('mousemove', inputMoveListen = function (move) {
@@ -383,19 +403,19 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     }
 
     else if (click.target.className === "btnTopView" && click.button == 0) {
-      showNotification("Top view", 1, "red");
+      showNotification("Top view", 1, normal, -20, null);
       angleY = -1.6;
       angleX = 0;
     }
 
     else if (click.target.className === "btnXview" && click.button == 0) {
-      showNotification("Front view", 1, "red");
+      showNotification("Front view", 1, normal, -20, null);
       angleY = 0;
       angleX = -1.6;
     }
 
     else if (click.target.className === "btnYview" && click.button == 0) {
-      showNotification("Side view", 1, "red");
+      showNotification("Side view", 1, normal, -20, null);
       angleY = 0;
       angleX = 0;
     }
@@ -404,33 +424,31 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
       switch (viewMode) {
         case 0:
           click.target.value = String.fromCharCode("0xE22A");
-          showNotification("Wireframe view", 1, "red");
+          showNotification("Wireframe view", 1, normal, -20, null);
           viewMode = 1;
           break;
         case 1:
           click.target.value = String.fromCharCode("0xE3F4");
-          showNotification("Textured view", 1, "red");
+          showNotification("Textured view", 1, normal, -20, null);
           viewMode = 2;
           break;
         case 2:
           click.target.value = String.fromCharCode("0xE3A2");
-          showNotification("Solid view", 1, "red");
+          showNotification("Solid view", 1, normal, -20, null);
           viewMode = 0;
           break;
       }
     }
 
-
-
     else if (click.target.className === "btnGrid" && click.button == 0) {
       if (viewGrid == true) {
         click.target.value = String.fromCharCode("0xE3EB")
-        showNotification("Grid OFF", 1, "red");
+        showNotification("Grid OFF", 1, normal, -20, null);
         viewGrid = false;
       }
       else if (viewGrid == false) {
         click.target.value = String.fromCharCode("0xE3EC");
-        showNotification("Grid ON", 1, "red");
+        showNotification("Grid ON", 1, normal, -20, null);
         viewGrid = true;
       }
     }
@@ -442,12 +460,12 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     else if (click.target.className === "btnLitUnlit" && click.button == 0) {
       if (lightingMode == 0) {
         click.target.value = String.fromCharCode("0xE25F");
-        showNotification("Set to Lit mode", 1, "red");
+        showNotification("Set to Lit mode", 1, normal, -20, null);
         lightingMode = 1;
       }
       else if (lightingMode == 1) {
         click.target.value = String.fromCharCode("0xE90F");
-        showNotification("Set to Unlit mode", 1, "red");
+        showNotification("Set to Unlit mode", 1, normal, -20, null);
         lightingMode = 0;
       }
     }
@@ -456,12 +474,12 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
 
       if (autoRotate == true) {
         click.target.value = String.fromCharCode("0xE036");
-        showNotification("Auto 3D Rotation stopped", 1, "red");
+        showNotification("Auto 3D Rotation stopped", 1, normal, -20, null);
         autoRotate = false;
       }
       else if (autoRotate == false) {
         click.target.value = String.fromCharCode("0xE84D");
-        showNotification("Auto 3D Rotation resumed", 1, "red");
+        showNotification("Auto 3D Rotation resumed", 1, normal, -20, null);
         autoRotate = true;
       }
     }
@@ -474,42 +492,39 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     else if (click.target.className === "btnWorkflow" && click.button == 0) {
       if (mapWorkflow == 1) {
         mapWorkflow = 2;
-        showNotification("Swithed to: Diffuse, Specular, Glossy workflow", 2, "red");
+        showNotification("Swithed to: Diffuse, Specular, Glossy workflow", 2, normal, -20, null);
       }
       else if (mapWorkflow == 2) {
         mapWorkflow = 1;
-        showNotification("Swithed to: Albedo, Metallic, Roughness workflow", 2, "red");
+        showNotification("Swithed to: Albedo, Metallic, Roughness workflow", 2, normal, -20, null);
       }
     }
 
     else if (click.target.className === "btnShading" && click.button == 0) {
       if (shadingMode == 1) {
         shadingMode = 2;
-        showNotification("Swithed to flat shading", 2, "red");
+        showNotification("Swithed to flat shading", 2, normal, -20, null);
       }
       else if (shadingMode == 2) {
         shadingMode = 1;
-        showNotification("Swithed to smooth shading", 2, "red");
+        showNotification("Swithed to smooth shading", 2, normal, -20, null);
       }
     }
 
     else if (click.target.className === "btnBumpNormal" && click.button == 0) {
       if (bumpNormal == 1) {
         bumpNormal = 2;
-        showNotification("Swithed to bump maps", 2, "red");
+        showNotification("Swithed to bump maps", 2, normal, -20, null);
       }
       else if (bumpNormal == 2) {
         bumpNormal = 1;
-        showNotification("Swithed to normal maps", 2, "red");
+        showNotification("Swithed to normal maps", 2, normal, -20, null);
       }
     }
 
     else if (click.target.className === "btnHelp" && click.button == 0) {
-      toggleModalWindow("Help menu", "<b>Coming soon!</b>\n" + helpTextLoremIpsum, "red");
+      toggleModalWindow("Help menu", "<b>Coming soon!</b>\n" + helpTextLoremIpsum, normal, -20);
     }
-
-
-
 
     else if (click.target.classList[0] === "btnWarnings" && click.button == 0) {
       if (click.target.value !== String.fromCharCode("0xE86C")) {
@@ -522,7 +537,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
         click.target.classList.remove("ok");
         click.target.classList.add("error");
       }
-      toggleModalWindow("Mesh validation report", "<b>The list bellow is just a placeholder!</b><li>Doubles detected!</li><li>N-gon limit exceeding!</li>", "red");
+      toggleModalWindow("Mesh validation report", "<b>The list bellow is just a placeholder!</b><li>Doubles detected!</li><li>N-gon limit exceeding!</li>", normal, -20);
     }
 
     else if (click.target.className === "btnFullScreen" && click.button == 0) {
@@ -543,8 +558,6 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     }
   }, false);
 }
-
-
 
 //// Parsers ////
 function parse3DS() {
