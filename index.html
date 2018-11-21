@@ -28,7 +28,9 @@
         <input class="btnRotation" type="button" value="&#xe84d" name="Toggle Auto Rotation">
         <input class="btnWorkflow" type="button" value="&#xe55b" name="Toggle between Albedo, Metallic, Roughness & Diffuse, Specular, Glossy workflow">
         <input class="btnBumpNormal" type="button" value="&#xe80b" name="Toggle between bump and normal">
+        <input class="btnEmissive" type="button" value="&#xe436" name="Toggle emissive maps">
         <input class="btnShading" type="button" value="&#xe3a5" name="Toggle shading between flat and smooth">
+        <input class="btnScale" type="button" value="&#xe260" name="Toggle scale">
         <input class="btnSyncViewport" type="button" value="&#xe627" name="Sync Viewpors (only if multiple)" disabled>
         <input class="btnHelp" type="button" value="&#xe8fd" name="Open help">
         <input class="btnWarnings error" type="button" value="&#xe002" name="Warning list">
@@ -36,11 +38,20 @@
       <canvas class="viewport">HTML5 is not supported, cannot draw a 3D viewport!</canvas>
     </div>
     <br>
-    <input type="button" value="Load ze Teapot!" name="Load ze Teapot!" style="font-family: Agency FB; width: auto; display: inline">
-    <input type="button" value="Load ze Monkey!" name="Load ze Monkey!" style="font-family: Agency FB; width: auto; display: inline">
-    <input type="button" value="Load ze Car!" name="Load ze Car!" style="font-family: Agency FB; width: auto; display: inline">
-    <input type="button" value="Load ze House!" name="Load ze House!" style="font-family: Agency FB; width: auto; display: inline">
     <script src="webgl/gl-matrix.js"></script> <!-- Load Matlib -->
     <script src="webgl/core.js"></script> <!-- Load WebGL Core -->
   </body>
 </html>
+
+
+<!-- The bellow code is optional and was meant just for the demo purposes -->
+<div style ="width: 480px; display:block; margin:auto;">
+  <input type="button" value="Load Teapot (.JSON)" style="font-family: Agency FB; width: auto; display: inline">
+  <input type="button" value="Load Monkey (.JSON)" style="font-family: Agency FB; width: auto; display: inline">
+  <input type="button" value="Load Duck (Collada .DAE)" style="font-family: Agency FB; width: auto; display: inline">
+  <input type="button" value="Load Teapot (Wavefront .OBJ)" style="font-family: Agency FB; width: auto; display: inline">
+  <input type="button" value="Load Jet (Autodesk .3DS)" style="font-family: Agency FB; width: auto; display: inline">
+  <input type="button" value="Load ---- (Autodesk 3ds Max Scene .MAX)" style="font-family: Agency FB; width: auto; display: inline">
+  <input type="button" value="Load Monkey (Blender .BLEND)" style="font-family: Agency FB; width: auto; display: inline">
+  <input type="button" value="Load ---- (.FBX)" style="font-family: Agency FB; width: auto; display: inline">
+</div>
