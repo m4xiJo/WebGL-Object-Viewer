@@ -6,12 +6,13 @@
     <title>WebGL 3D Object Viewer</title>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css">
   </head>
-  <body onload="runWebGL('fixtures/json/Teapot/Teapot.json', 'fixtures/json/Teapot/textures/ceramic.jpg', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png')" oncontextmenu="return false;">
+  <body onload="runWebGL('fixtures/json/Suzanne/Suzanne.json', 'fixtures/json/Suzanne/textures/Suzanne_tex.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png')" oncontextmenu="return false;">
     <div class="workArea" class="workArea">
       <div class="notification"><a class="notyTitle">Notification</a></div>
       <div class="modal"><a class="modalTitle">Title</a><input class="btnClose" type="button" value="&#xe5cd"><a class="modalContent"></a></div>
       <div class="verticalPanelRight">
         <a class="FPS">0</a>
+				<input class="btnResetView" type="button" value="&#xe8ba" name="Reset View">
         <input class="btnTopView" type="button" value="&#xe5db" name="Top View">
         <input class="btnXview" type="button" value="&#xe5c4" name="X View">
         <input class="btnYview" type="button" value="&#xe5c8" name="Y View">
@@ -22,18 +23,19 @@
       </div>
       <div class="verticalPanelLeft">
         <a class="stats">V:0 F:0 T:0</a>
-        <input class="btnLitUnlit" type="button" value="&#xe25f" name="Toggle Lit/Unlit">
-        <input class="btnViewMode" type="button" value="&#xe3f4" name="Toggle Solid/Wireframe/Texture">
-        <input class="btnGrid" type="button" value="&#xe3ec" name="Toggle Grid">
-        <input class="btnRotation" type="button" value="&#xe84d" name="Toggle Auto Rotation">
-        <input class="btnWorkflow" type="button" value="&#xe55b" name="Toggle between Albedo, Metallic, Roughness & Diffuse, Specular, Glossy workflow">
-        <input class="btnBumpNormal" type="button" value="&#xe80b" name="Toggle between bump and normal">
-        <input class="btnEmissive" type="button" value="&#xe436" name="Toggle emissive maps">
-        <input class="btnShading" type="button" value="&#xe3a5" name="Toggle shading between flat and smooth">
-        <input class="btnScale" type="button" value="&#xe260" name="Toggle scale">
-        <input class="btnSyncViewport" type="button" value="&#xe627" name="Sync Viewpors (only if multiple)" disabled>
+        <input class="btnLitUnlit" type="button" value="" name="Toggle Lit/Unlit">
+        <input class="btnViewMode" type="button" value="" name="Toggle Solid/Wireframe/Texture">
+        <input class="btnGrid" type="button" value="" name="Toggle Grid">
+        <input class="btnRotation" type="button" value="" name="Toggle Auto Rotation">
+        <input class="btnWorkflow" type="button" value="" name="Toggle between Albedo, Metallic, Roughness & Diffuse, Specular, Glossy workflow">
+        <input class="btnBumpNormal" type="button" value="" name="Toggle between bump and normal">
+        <input class="btnEmissive" type="button" value="" name="Toggle emissive maps">
+        <input class="btnShading" type="button" value="" name="Toggle shading between flat and smooth">
+        <input class="btnScale" type="button" value="" name="Toggle scale">
+				<input class="btnAnimationPane" type="button" value="" name="Toggle animation pane">
+        <input class="btnSyncViewport" type="button" value="" name="Sync Viewpors (only if multiple)" disabled>
         <input class="btnHelp" type="button" value="&#xe8fd" name="Open help">
-        <input class="btnWarnings error" type="button" value="&#xe002" name="Warning list">
+        <input class="btnWarnings" type="button" value="" name="Warning list">
       </div>
       <canvas class="viewport">HTML5 is not supported, cannot draw a 3D viewport!</canvas>
     </div>

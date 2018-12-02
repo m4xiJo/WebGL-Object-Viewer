@@ -23,7 +23,7 @@
       .notification {position: absolute; z-index: 3; color: white; width: 100%; opacity: 0; visibility: hidden}
       .modal {position: absolute; z-index: 3; color: white; width: 100%; opacity: 0; visibility: hidden; transition: 0.2s}
       .modalTitle {padding: 0px 8px 1px 8px; display: block; font-weight: bold}
-      .modalContent {padding: 4px 14px 4px 14px;; display: block; background: white; color: black; font-size: small; border-bottom: 1px solid #7e7e7e}
+      .modalContent {padding: 4px 14px 4px 14px;; display: block; background: white; color: black; font-size: small; border-bottom: 1px solid #7e7e7e; overflow-y: auto; max-height: 451px;}
       .notification a, {padding: 0px 8px 1px 8px; display: block}
       .notification:active {animation: fadein 1s}
       .btnClose {top: 0; right: 0; margin: 0; padding: 0 !important; margin: 0 !important; position: absolute}

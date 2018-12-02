@@ -1,7 +1,4 @@
-var helpTextLoremIpsum = "<p>Ea paulo intellegat omittantur sit, esse liber at qui, vix cu ludus volutpat. Cibo dicit nonumes has et, his ne lorem scripta scriptorem, sea ex oblique deseruisse argumentum. Eu dolorum consequuntur quo. Nonumy omnium pri ea. </p><p>Est ex recusabo delicata, imperdiet concludaturque id est. Option conclusionemque ne mei. Ex eam accumsan inimicus. Has nominavi voluptatum complectitur ad. Libris nemore ad qui, te his probo utroque. Eu meliore admodum eum. </p><p>Cu option feugiat dolorem per, per an tale legere. Oporteat vulputate cu eos, sonet virtute no mel. Eos altera animal oporteat et, id perfecto interpretaris qui. Putent dicunt maiorum an has, et duo atqui animal eligendi. Sale tamquam pericula quo eu, nostrud intellegat an est, ea usu vitae nominati. Dicam vocent dolorem pro ut, ea per iudico minimum, an simul aperiam malorum ius. Ei pro facer tritani, quodsi accusata eu qui. </p><p>Te mel dicant scribentur theophrastus, vis falli postulant constituam ad. Cum eu mnesarchum instructior. Malis putent petentium pro in, an est senserit elaboraret intellegebat, mei in mollis mediocritatem. Ad eum illud fugit. In suas homero nemore his. </p><p>Pro illum aliquip in, pri et affert iracundia. Simul melius nostrum eum ei, simul nostro invidunt qui in, ei omnium latine omittam duo. Pri an dicant lucilius aliquando, brute feugait adolescens pri eu, vel cu fabulas pertinacia. Mea noster delectus dignissim et, est ea illum intellegat. Epicurei philosophia id vim. </p><p>Oratio insolens ullamcorper ex has, ad ius solet ignota reprehendunt. Duo petentium erroribus at, quem nostrum ad his. Nam omnis posidonium ne, partem vocibus pri an, ius no nominati gubergren. Verear recteque philosophia ius cu, ad oblique propriae vel. </p><p>Vel dolor legendos salutandi et, vitae primis inimicus sed an. Ad sed omnis iracundia, facer nonumy saperet eu nec. Cu signiferumque mediocritatem vix. Vis id erant possim. In pro quidam labores. Ei sit oblique atomorum honestatis, quo mazim delicata cu, cu nibh graeci facilisi duo. </p><p>Ei vix magna malorum nominati. Hinc indoctum repudiare cu vix. Graeco vocent deseruisse nam eu. Ea cum suscipit elaboraret. At nulla tincidunt pri. </p><p>Ex pro consul sanctus, ea ullum ancillae facilisis pri. Ex pro quaeque honestatis, eam ad zril dictas, mei ponderum disputando id. Liber adversarium est te. Cibo impetus reprimique no quo, id eos viderer honestatis. Amet platonem consulatu ei cum, omnis assum eu est, vel cu suscipit facilisi. </p><p>Sea congue denique no, persius scaevola vel ne. Ut sit eius illum accusam, at volutpat abhorreant scriptorem per. Periculis theophrastus nec te, eam id commune omnesque, ius at mutat volumus nostrum. Vim stet impetus instructior ea, mei ea viderer torquatos. Et vero dicat timeam vis.</p>";
-
-
-function runWebGL(meshPath, adPath, nbPath, smPath, grPath) {
+function runWebGL(meshPath, adPath, nbPath, smPath, grPath, emPath) {
   // Prepare Vertex shader
   let vertexShader = [
     "precision mediump float;",
@@ -10,13 +7,13 @@ function runWebGL(meshPath, adPath, nbPath, smPath, grPath) {
     "attribute vec3 vertNormal;",
     "varying vec2 fragTexCoord;",
     "varying vec3 fragNormal;",
-    "uniform mat4 mWorld;",
-    "uniform mat4 mView;",
-    "uniform mat4 mProj;",
+    "uniform mat4 world;",
+    "uniform mat4 view;",
+    "uniform mat4 proj;",
     "void main() {",
         "fragTexCoord = vertTexCoord;",
-        "fragNormal = (mWorld * vec4(vertNormal, 0.0)).xyz;",
-        "gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);",
+        "fragNormal = (world * vec4(vertNormal, 0.0)).xyz;",
+        "gl_Position = proj * view * world * vec4(vertPosition, 1.0);",
     "}",
   ].join("");
 
@@ -25,7 +22,8 @@ function runWebGL(meshPath, adPath, nbPath, smPath, grPath) {
     "precision mediump float;",
     "struct directionalLight {",
       "vec3 direction;",
-      "vec3 color;};",
+      "vec3 color;",
+		"};",
     "varying vec2 fragTexCoord;",
     "varying vec3 fragNormal;",
     "uniform vec3 ambientLightIntensity;",
@@ -57,18 +55,23 @@ function runWebGL(meshPath, adPath, nbPath, smPath, grPath) {
           loadFile(nbPath, function(nbErr, nbObj) {
             if (nbErr) console.error("Error getting mesh Normal/Bump map! " + nbErr + " Skipping...");
             else nbPath = nbObj;
+						// Load Specular/Metallic
+	          loadFile(smPath, function(smErr, smObj) {
+	            if (smErr) console.error("Error getting mesh Specual/Metallic map! Skipping..." + smErr + " Skipping...");
+	            else smPath = smObj;
+							// Load Glossy/Rough
+		          loadFile(grPath, function(grErr, grObj) {
+		            if (grErr) console.error("Error getting mesh Glossy/Roughness map! Skipping..." + grErr + " Skipping...");
+		            else grPath = grObj;
+								// Load Emissive
+								loadFile(emPath, function(emErr, emObj) {
+									if (emErr) console.error("Error getting mesh Emissive map! Skipping..." + emErr + " Skipping...");
+									else emPath = emObj;
+									execWebGL(vertexShader, fragmentShader, meshVertex, meshIndex, meshTexCoords, meshNormals, adPath, nbPath, smPath, grPath, emPath);
+								});
+		          });
+	          });
           });
-          // Load Specular/Metallic
-          loadFile(smPath, function(smErr, smObj) {
-            if (smErr) console.error("Error getting mesh Specual/Metallic map! Skipping..." + smErr + " Skipping...");
-            else smPath = smObj;
-          });
-          // Load Glossy/Rough
-          loadFile(grPath, function(grErr, grObj) {
-            if (grErr) console.error("Error getting mesh Glossy/Roughness map! Skipping..." + grErr + " Skipping...");
-            else grPath = grObj;
-          });
-          execWebGL(vertexShader, fragmentShader, meshVertex, meshIndex, meshTexCoords, meshNormals, adPath, nbPath, smPath, grPath);
         }
       });
     }
@@ -111,7 +114,148 @@ function loadFile(url, callback) {
   }
 }
 
-function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshIndecies, meshTexCoords, meshNormals, texture_ad, texture_nb, texture_sm, texture_gr) {
+function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshIndecies, meshTexCoords, meshNormals, texture_ad, texture_nb, texture_sm, texture_gr, texture_em) {
+	//// Global variables ////
+	//UI configuration
+	let helpText = "<p>Ea paulo intellegat omittantur sit, esse liber at qui, vix cu ludus volutpat. Cibo dicit nonumes has et, his ne lorem scripta scriptorem, sea ex oblique deseruisse argumentum. Eu dolorum consequuntur quo. Nonumy omnium pri ea. </p><p>Est ex recusabo delicata, imperdiet concludaturque id est. Option conclusionemque ne mei. Ex eam accumsan inimicus. Has nominavi voluptatum complectitur ad. Libris nemore ad qui, te his probo utroque. Eu meliore admodum eum. </p><p>Cu option feugiat dolorem per, per an tale legere. Oporteat vulputate cu eos, sonet virtute no mel. Eos altera animal oporteat et, id perfecto interpretaris qui. Putent dicunt maiorum an has, et duo atqui animal eligendi. Sale tamquam pericula quo eu, nostrud intellegat an est, ea usu vitae nominati. Dicam vocent dolorem pro ut, ea per iudico minimum, an simul aperiam malorum ius. Ei pro facer tritani, quodsi accusata eu qui. </p><p>Te mel dicant scribentur theophrastus, vis falli postulant constituam ad. Cum eu mnesarchum instructior. Malis putent petentium pro in, an est senserit elaboraret intellegebat, mei in mollis mediocritatem. Ad eum illud fugit. In suas homero nemore his. </p><p>Pro illum aliquip in, pri et affert iracundia. Simul melius nostrum eum ei, simul nostro invidunt qui in, ei omnium latine omittam duo. Pri an dicant lucilius aliquando, brute feugait adolescens pri eu, vel cu fabulas pertinacia. Mea noster delectus dignissim et, est ea illum intellegat. Epicurei philosophia id vim. </p><p>Oratio insolens ullamcorper ex has, ad ius solet ignota reprehendunt. Duo petentium erroribus at, quem nostrum ad his. Nam omnis posidonium ne, partem vocibus pri an, ius no nominati gubergren. Verear recteque philosophia ius cu, ad oblique propriae vel. </p><p>Vel dolor legendos salutandi et, vitae primis inimicus sed an. Ad sed omnis iracundia, facer nonumy saperet eu nec. Cu signiferumque mediocritatem vix. Vis id erant possim. In pro quidam labores. Ei sit oblique atomorum honestatis, quo mazim delicata cu, cu nibh graeci facilisi duo. </p><p>Ei vix magna malorum nominati. Hinc indoctum repudiare cu vix. Graeco vocent deseruisse nam eu. Ea cum suscipit elaboraret. At nulla tincidunt pri. </p><p>Ex pro consul sanctus, ea ullum ancillae facilisis pri. Ex pro quaeque honestatis, eam ad zril dictas, mei ponderum disputando id. Liber adversarium est te. Cibo impetus reprimique no quo, id eos viderer honestatis. Amet platonem consulatu ei cum, omnis assum eu est, vel cu suscipit facilisi. </p><p>Sea congue denique no, persius scaevola vel ne. Ut sit eius illum accusam, at volutpat abhorreant scriptorem per. Periculis theophrastus nec te, eam id commune omnesque, ius at mutat volumus nostrum. Vim stet impetus instructior ea, mei ea viderer torquatos. Et vero dicat timeam vis.</p>";
+
+	let dataStorage = {
+		ui: {
+			colors: {
+				normal: "#5c5c5c",
+				success: "#036f00",
+				warning: "#808d00",
+				error: "#ba0000",
+				colorMod: -20
+			}
+		},
+		modes: {
+			lightingMode: {
+				state: 1,
+				icons: ["0xe3a8", "0xe3aa"],
+				bind: document.getElementsByClassName("btnLitUnlit")[0]
+			},
+			viewMode: {
+				state: 2,
+				icons: ["0xe3a2", "0xe228", "0xe421"],
+				bind: document.getElementsByClassName("btnViewMode")[0]
+			},
+			viewGrid: {
+				state: 0,
+				icons: ["0xe3eb", "0xe3ec"],
+				bind: document.getElementsByClassName("btnGrid")[0]
+			},
+			autoRotate: {
+				state: 1,
+				icons: ["0xe84d", "0xe036"],
+				bind: document.getElementsByClassName("btnRotation")[0]
+			},
+			mapWorkflow: {
+				state: 1,
+				icons: ["0xe55b", "0xe55b", "0xe55b"],
+				bind: document.getElementsByClassName("btnWorkflow")[0]
+			},
+			bumpNormal: {
+				state: 1,
+				icons: ["0xe80b", "0xe80b"],
+				bind: document.getElementsByClassName("btnBumpNormal")[0]
+			},
+			shadingMode: {
+				state: 1,
+				icons: ["0xe3a4", "0xe3a5"],
+				bind: document.getElementsByClassName("btnShading")[0]
+			},
+			emissiveMap: {
+				state: 1,
+				icons: ["0xe3c0", "0xe436"],
+				bind: document.getElementsByClassName("btnEmissive")[0]
+			},
+			objScale: {
+				state: 0,
+				icons: ["0xe41c", "0xe41c", "0xe41c", "0xe41c", "0xe41c", "0xe41c"],
+				bind: document.getElementsByClassName("btnScale")[0]
+			},
+			animPane: {
+				state: 0,
+				icons: ["0xe84e", "0xe566"],
+				bind: document.getElementsByClassName("btnAnimationPane")[0]
+			},
+			syncViewports: {
+				state: 0,
+				icons: ["0xe628", "0xe627"],
+				bind: document.getElementsByClassName("btnSyncViewport")[0]
+			},
+			warnings: {
+				state: 0,
+				windowState: 0,
+				icons: ["0xe86c", "0xe002", "0xe417"],
+				bind: document.getElementsByClassName("btnWarnings")[0],
+				warnings: {},
+				warningsCode: 0
+			}
+		},
+		core: {
+			helpText: helpText,
+			time: {
+				startTime: new Date().getTime(),
+				currentTime: null,
+				timer: null
+			},
+			fpsViewer: {
+				fpsViewerObj: document.getElementsByClassName("FPS")[0],
+				fpsCount: 0
+			},
+			meshInfo: {
+				meshInfoObj: document.getElementsByClassName("stats")[0],
+				meshInfoString: ""
+			},
+			positions: {
+				angleY: 0,
+				angleX: 0,
+				zoomRatio: 0,
+				mouseMoveX: 0,
+				mouseMoveY: 0,
+				isScrolling: null,
+				isMoving: null
+			},
+			grid: {
+				vertexData: "[1.0 1.0 0.0 -1.0 1.0 0.0 1.0 -1.0 0.0 -1.0 -1.0 0.0]",
+			}
+		}
+	}
+
+	loadData("userData"); //Call saved data load
+	//Function to write data
+	function saveData(slotName, data) {
+		if (!localStorage.getItem(slotName)) localStorage.setItem(slotName, "null");
+		let constructedData = {};
+		for (item in data) {
+			constructedData[item] = item;
+			constructedData[item] = data[item].state;
+		}
+		localStorage.setItem(slotName, JSON.stringify(constructedData));
+	}
+
+	//Function to load data
+	function loadData(slotName) {
+		let loadedData = JSON.parse(localStorage.getItem(slotName));
+		for (item in loadedData) {
+			console.log(item);
+			dataStorage.modes[item].state = loadedData[item];
+		}
+	}
+
+	//Update button states on load
+	for (mode in dataStorage.modes) {
+		dataStorage.modes[mode].bind.value = String.fromCharCode(dataStorage.modes[mode].icons[dataStorage.modes[mode].state]);
+	}
+
+	// Reset FPS counter on focus
+	window.onfocus = function() {
+		dataStorage.core.time.startTime = new Date().getTime();
+		dataStorage.core.fpsViewer.fpsCount = 0;
+	};
+
   //Initialize and configure WebGL
   let canvas = document.getElementsByClassName("viewport")[0];
   let gl = canvas.getContext("webgl");
@@ -142,6 +286,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   gl.compileShader(vertexShader);
   if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
     console.error("ERROR failed to compile Vertex Shader", gl.getShaderInfoLog(vertexShader));
+		showNotification("ERROR! failed to compile Vertex Shader! See console!", 2, ui.colors.error, ui.colors.colorMod);
     return;
   }
 
@@ -149,6 +294,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   gl.compileShader(fragmentShader);
   if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
     console.error("ERROR failed to compile Fragment Shader", gl.getShaderInfoLog(fragmentShader));
+		showNotification("ERROR! failed to compile Fragment Shader! See console!", 2, ui.colors.error, ui.colors.colorMod);
     return;
   }
 
@@ -159,11 +305,13 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   gl.linkProgram(program);
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
     console.error("ERROR failed to link program!", gl.getProgramInfoLog(program));
+		showNotification("ERROR! failed to link the program! See console!", 2, ui.colors.error, ui.colors.colorMod);
     return;
   }
   gl.validateProgram(program);
   if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
     console.error("ERROR validating program!", gl.getProgramInfoLog(program));
+		showNotification("Validation ERROR! See console!", 2, ui.colors.normal, ui.error.colorMod);
     return;
   }
 
@@ -204,16 +352,16 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   // Tell which program is active
   gl.useProgram(program);
 
-  let matWorldUniformLocation = gl.getUniformLocation(program, "mWorld");
-  let matViewUniformLocation = gl.getUniformLocation(program, "mView");
-  let matProjUniformLocation = gl.getUniformLocation(program, "mProj");
+  let matWorldUniformLocation = gl.getUniformLocation(program, "world");
+  let matViewUniformLocation = gl.getUniformLocation(program, "view");
+  let matProjUniformLocation = gl.getUniformLocation(program, "proj");
 
   let projMatrix = new Float32Array(16);
   let viewMatrix = new Float32Array(16);
   let worldMatrix = new Float32Array(16);
 
   mat4.identity(worldMatrix);
-  mat4.lookAt(viewMatrix, [0, 0, -200], [0, 0, 0], [0, 1, 0]);
+  mat4.lookAt(viewMatrix, [0, 0, -6], [0, 0, 0], [0, 1, 0]);
   mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.clientWidth / canvas.clientHeight, 1, 2000);
 
   gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
@@ -235,37 +383,6 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   let identityMatrix = new Float32Array(16);
   mat4.identity(identityMatrix);
 
-  //// Global variables ////
-  let angleY = 0;
-  let angleX = 0;
-  let zoomRatio = 0;
-  let mouseMoveX = 0;
-  let mouseMoveY = 0;
-  let fpsCounter = document.getElementsByClassName("FPS")[0];
-  let startTime = new Date().getTime();
-  let currentTime;
-  let frameCounter = 0;
-
-  //States
-  let isScrolling;
-  let isMoving;
-
-  //Modes
-  let autoRotate = true;
-  let viewGrid = true;
-  let lightingMode = 1;
-  let viewMode = 2;
-  let mapWorkflow = 1;
-  let bumpNormal = 1;
-  let shadingMode = 1;
-	let emissiveMaps = true;
- 	let objScale = 1;
-
-  window.onfocus = function() {
-    startTime = new Date().getTime();
-    frameCounter = 0;
-  };
-
   //// Create Textures ////
   // Albedo/Diffuse
   let meshTexture = gl.createTexture();
@@ -279,18 +396,56 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   gl.bindTexture(gl.TEXTURE_2D, null);
 
   // Normal/Bump
+	let meshNormalBump = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, meshNormalBump);
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_nb);
+	gl.bindTexture(gl.TEXTURE_2D, null);
 
   // Specular/Metallic
+	let meshSpecMetal = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, meshSpecMetal);
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_sm);
+	gl.bindTexture(gl.TEXTURE_2D, null);
 
   // Glossy/Rough
+	let meshGlossRough = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, meshGlossRough);
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_gr);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+
+	// Emissive
+	let meshEmissive = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, meshEmissive);
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_em);
+	gl.bindTexture(gl.TEXTURE_2D, null);
 
   //// Render update loop ////
   let updateLoop = function () {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
-    if (autoRotate) angleX = performance.now() / 6000 * Math.PI;
-    if (lightingMode == 1) {
+    if (dataStorage.modes.autoRotate.state == 1) dataStorage.core.positions.angleX = performance.now() / 6000 * Math.PI;
+    if (dataStorage.modes.lightingMode.state == 1) {
       gl.uniform3f(ambLightIntensityUniformLocation, 0.2, 0.2, 0.2);
       gl.uniform3f(sunlightIntUniformLocation, 1.0, 1.0, 1.0);
     }
@@ -299,38 +454,35 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
       gl.uniform3f(sunlightIntUniformLocation, 0.0, 0.0, 0.0);
     }
 
-		mat4.rotate(yRotationMatrix, identityMatrix, angleX, [0, 1, 0]);
-		mat4.rotate(xRotationMatrix, identityMatrix, angleY, [1, 0, 0]);
+		mat4.rotate(yRotationMatrix, identityMatrix, dataStorage.core.positions.angleX, [0, 1, 0]);
+		mat4.rotate(xRotationMatrix, identityMatrix, dataStorage.core.positions.angleY, [1, 0, 0]);
 		mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
     gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
     gl.clearColor(0.8, 0.8, 0.8, 1.0);
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
     gl.bindTexture(gl.TEXTURE_2D, meshTexture);
     gl.activeTexture(gl.TEXTURE0);
-    if (viewMode == 0) gl.drawElements(gl.TRIANGLES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
-    else if (viewMode == 1) gl.drawElements(gl.LINES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
-    else if (viewMode == 2) gl.drawElements(gl.TRIANGLES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
-    currentTime = new Date().getTime();
-    fpsCounter.innerText = parseInt(frameCounter / (currentTime - startTime) * 1000);
-    frameCounter++;
+    if (dataStorage.modes.viewMode.state == 0) gl.drawElements(gl.TRIANGLES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
+    else if (dataStorage.modes.viewMode.state == 1) {
+			gl.drawElements(gl.LINES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
+		}
+    else if (dataStorage.modes.viewMode.state == 2) {
+			gl.drawElements(gl.TRIANGLES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
+		}
+    dataStorage.core.time.currentTime = new Date().getTime();
+    dataStorage.core.fpsViewer.fpsViewerObj.innerText = parseInt(dataStorage.core.fpsViewer.fpsCount / (dataStorage.core.time.currentTime - dataStorage.core.time.startTime) * 1000);
+    dataStorage.core.fpsViewer.fpsCount++;
     requestAnimationFrame(updateLoop);
   }
   requestAnimationFrame(updateLoop);
 
   //// GUI Events ////
   //Show notification
-  // Colors
-  let normal = "#5c5c5c";
-  let success = "#036f00";
-  let warning = "#808d00";
-  let error = "#ba0000";
-  let timer = null;
-
-  function showNotification(text, time, color, percent, timeOut) {
-    clearTimeout(timer);
+  function showNotification(text, time, color, percent) {
+    clearTimeout(dataStorage.core.time.timer);
     document.getElementsByClassName("notyTitle")[0].innerText = text;
 		document.getElementsByClassName("notification")[0].setAttribute("style", "animation: fadein " + time + "s; background: " + color + "; border-bottom: 1px solid " + modifyColor(color, percent));
-    timer = setTimeout(function() {
+    dataStorage.core.time.timer = setTimeout(function() {
       document.getElementsByClassName("notification")[0].style.animation = null;
     }, time * 1000);
   }
@@ -361,18 +513,18 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
 
   document.getElementsByClassName("viewport")[0].addEventListener('mousemove', inputMoveListen = function (move) {
     if (move.clientX && move.buttons == 1) {
-      angleX += ((move.clientX - mouseMoveX) * 0.01)
+      dataStorage.core.positions.angleX += ((move.clientX - dataStorage.core.positions.mouseMoveX) * 0.01)
     }
     if (move.clientY && move.buttons == 1) {
-      angleY -= ((move.clientY - mouseMoveY) * 0.01);
+      dataStorage.core.positions.angleY -= ((move.clientY - dataStorage.core.positions.mouseMoveY) * 0.01);
     }
-    mouseMoveX = move.clientX;
-    mouseMoveY = move.clientY;
+    dataStorage.core.positions.mouseMoveX = move.clientX;
+    dataStorage.core.positions.mouseMoveY = move.clientY;
 
     if (move.clientX && move.buttons == 2)
       move.target.style.cursor = "move";
-        window.clearTimeout(isMoving);
-        isMoving = setTimeout(function() {
+        window.clearTimeout(dataStorage.core.positions.isMoving);
+        dataStorage.core.positions.isMoving = setTimeout(function() {
           move.target.style.cursor = null;
         }, 50);
   }, false);
@@ -392,196 +544,248 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
 
 	//Track click events
   document.addEventListener('click', inputClickListen = function (click) {
-
 		//// Left column buttons ////
 		//Lit/Unlit togle button cLick
 		if (click.target.className === "btnLitUnlit" && click.button == 0) {
-			if (lightingMode == 0) {
-				click.target.value = String.fromCharCode("0xE25F");
-				showNotification("Set to Lit mode", 1, normal, -20, null);
-				lightingMode = 1;
+			if (dataStorage.modes.lightingMode.state == 0) {
+				click.target.value = String.fromCharCode(dataStorage.modes.lightingMode.icons[1]);
+				dataStorage.modes.lightingMode.state = 1;
+				showNotification("Set to Lit mode", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
-			else if (lightingMode == 1) {
-				click.target.value = String.fromCharCode("0xE90F");
-				showNotification("Set to Unlit mode", 1, normal, -20, null);
-				lightingMode = 0;
+			else if (dataStorage.modes.lightingMode.state == 1) {
+				click.target.value = String.fromCharCode(dataStorage.modes.lightingMode.icons[0]);
+				dataStorage.modes.lightingMode.state = 0;
+				showNotification("Set to Unlit mode", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
+			saveData("userData", dataStorage.modes);
 		}
 
 		//Object view button click
 		else if (click.target.className === "btnViewMode" && click.button == 0) {
-			switch (viewMode) {
+			switch (dataStorage.modes.viewMode.state) {
 				case 0:
-					click.target.value = String.fromCharCode("0xE22A");
-					showNotification("Wireframe view", 1, normal, -20, null);
-					viewMode = 1;
+					click.target.value = String.fromCharCode(dataStorage.modes.viewMode.icons[1]);
+					dataStorage.modes.viewMode.state = 1;
+					showNotification("Wireframe view", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 					break;
 				case 1:
-					click.target.value = String.fromCharCode("0xE3F4");
-					showNotification("Textured view", 1, normal, -20, null);
-					viewMode = 2;
+					click.target.value = String.fromCharCode(dataStorage.modes.viewMode.icons[2]);
+					dataStorage.modes.viewMode.state = 2;
+					showNotification("Textured view", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 					break;
 				case 2:
-					click.target.value = String.fromCharCode("0xE3A2");
-					showNotification("Solid view", 1, normal, -20, null);
-					viewMode = 0;
+					click.target.value = String.fromCharCode(dataStorage.modes.viewMode.icons[0]);
+					dataStorage.modes.viewMode.state = 0;
+					showNotification("Solid view", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 					break;
 			}
+			saveData("userData", dataStorage.modes);
 		}
 
 		//Grid toggle button click
 		else if (click.target.className === "btnGrid" && click.button == 0) {
-			if (viewGrid == true) {
-				click.target.value = String.fromCharCode("0xE3EB")
-				showNotification("Grid OFF", 1, normal, -20, null);
-				viewGrid = false;
+			if (dataStorage.modes.viewGrid.state == 1) {
+				click.target.value = String.fromCharCode(dataStorage.modes.viewGrid.icons[0]);
+				dataStorage.modes.viewGrid.state = 0;
+				showNotification("Grid OFF", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
-			else if (viewGrid == false) {
-				click.target.value = String.fromCharCode("0xE3EC");
-				showNotification("Grid ON", 1, normal, -20, null);
-				viewGrid = true;
+			else if (dataStorage.modes.viewGrid.state == 0) {
+				click.target.value = String.fromCharCode(dataStorage.modes.viewGrid.icons[1]);
+				dataStorage.modes.viewGrid.state = 1;
+				showNotification("Grid ON", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
+			saveData("userData", dataStorage.modes);
 		}
 
 		//Auto rotation on/off button click
 		else if (click.target.className === "btnRotation" && click.button == 0) {
-
-			if (autoRotate == true) {
-				click.target.value = String.fromCharCode("0xE036");
-				showNotification("Auto 3D Rotation stopped", 1, normal, -20, null);
-				autoRotate = false;
+			if (dataStorage.modes.autoRotate.state == 1) {
+				click.target.value = String.fromCharCode(dataStorage.modes.autoRotate.icons[0]);
+				dataStorage.modes.autoRotate.state = 0;
+				showNotification("Auto 3D Rotation stopped", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
-			else if (autoRotate == false) {
-				click.target.value = String.fromCharCode("0xE84D");
-				showNotification("Auto 3D Rotation resumed", 1, normal, -20, null);
-				autoRotate = true;
+			else if (dataStorage.modes.autoRotate.state == 0) {
+				click.target.value = String.fromCharCode(dataStorage.modes.autoRotate.icons[1]);
+				dataStorage.modes.autoRotate.state = 1;
+				showNotification("Auto 3D Rotation resumed", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
+			saveData("userData", dataStorage.modes);
 		}
 
 		//Switch workflow button
 		else if (click.target.className === "btnWorkflow" && click.button == 0) {
-			if (mapWorkflow == 1) {
-				mapWorkflow = 2;
-				showNotification("Swithed to: Diffuse, Specular, Glossy workflow", 2, normal, -20, null);
+			if (dataStorage.modes.mapWorkflow.state == 0) {
+				click.target.value = String.fromCharCode(dataStorage.modes.mapWorkflow.icons[1]);
+				dataStorage.modes.mapWorkflow.state = 1;
+				showNotification("Swithed to: Diffuse, Specular, Glossy workflow", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
-			else if (mapWorkflow == 2) {
-				mapWorkflow = 1;
-				showNotification("Swithed to: Albedo, Metallic, Roughness workflow", 2, normal, -20, null);
+			else if (dataStorage.modes.mapWorkflow.state == 1) {
+				click.target.value = String.fromCharCode(dataStorage.modes.mapWorkflow.icons[0]);
+				dataStorage.modes.mapWorkflow.state = 0;
+				showNotification("Swithed to: Albedo, Metallic, Roughness workflow", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
+			saveData("userData", dataStorage.modes);
 		}
 
 		//Bump/Normal button toggle
 		else if (click.target.className === "btnBumpNormal" && click.button == 0) {
-			if (bumpNormal == 1) {
-				bumpNormal = 2;
-				showNotification("Swithed to bump maps", 2, normal, -20, null);
+			if (dataStorage.modes.bumpNormal.state == 0) {
+				click.target.value = String.fromCharCode(dataStorage.modes.bumpNormal.icons[1]);
+				dataStorage.modes.bumpNormal.state = 1;
+				showNotification("Swithed to bump maps", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
-			else if (bumpNormal == 2) {
-				bumpNormal = 1;
-				showNotification("Swithed to normal maps", 2, normal, -20, null);
+			else if (dataStorage.modes.bumpNormal.state == 1) {
+				click.target.value = String.fromCharCode(dataStorage.modes.bumpNormal.icons[0]);
+				dataStorage.modes.bumpNormal.state = 0;
+				showNotification("Swithed to normal maps", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
+			saveData("userData", dataStorage.modes);
 		}
 
 		//Toggle Emissive maps
 		else if (click.target.className === "btnEmissive" && click.button == 0) {
-			if (shadingMode == true) {
-				shadingMode = false;
-				showNotification("Emissive maps OFF", 1, normal, -20, null);
+			if (dataStorage.modes.emissiveMap.state == 1) {
+				click.target.value = String.fromCharCode(dataStorage.modes.emissiveMap.icons[0]);
+				dataStorage.modes.emissiveMap.state = 0;
+				showNotification("Emissive maps OFF", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
-			else if (shadingMode == false) {
-				shadingMode = true;
-				showNotification("Emissive maps ON", 1, normal, -20, null);
+			else if (dataStorage.modes.emissiveMap.state == 0) {
+				click.target.value = String.fromCharCode(dataStorage.modes.emissiveMap.icons[1]);
+				dataStorage.modes.emissiveMap.state = 1;
+				showNotification("Emissive maps ON", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
+			saveData("userData", dataStorage.modes);
 		}
 
 		//Toggle shading button
 		else if (click.target.className === "btnShading" && click.button == 0) {
-			if (shadingMode == 1) {
-				shadingMode = 2;
-				showNotification("Swithed to flat shading", 2, normal, -20, null);
+			if (dataStorage.modes.shadingMode.state == 1) {
+				click.target.value = String.fromCharCode(dataStorage.modes.shadingMode.icons[0]);
+				dataStorage.modes.shadingMode.state = 0;
+				showNotification("Swithed to flat shading", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
-			else if (shadingMode == 2) {
-				shadingMode = 1;
-				showNotification("Swithed to smooth shading", 2, normal, -20, null);
+			else if (dataStorage.modes.shadingMode.state == 0) {
+				click.target.value = String.fromCharCode(dataStorage.modes.shadingMode.icons[1]);
+				dataStorage.modes.shadingMode.state = 1;
+				showNotification("Swithed to smooth shading", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
+			saveData("userData", dataStorage.modes);
 		}
 
 		//Toggle object scale
 		else if (click.target.className === "btnScale" && click.button == 0) {
-			switch (objScale) {
+			switch (dataStorage.modes.objScale.state) {
 				case 0:
-					//click.target.value = String.fromCharCode("0xE22A");
-					showNotification("Changed to Millimeters", 1, normal, -20, null);
-					objScale = 1;
+					click.target.value = String.fromCharCode(dataStorage.modes.objScale.icons[1]);
+					dataStorage.modes.objScale.state = 1;
+					showNotification("Changed to Millimeters", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 					break;
 				case 1:
-					showNotification("Changed to Centimeters", 1, normal, -20, null);
-					objScale = 2;
+					click.target.value = String.fromCharCode(dataStorage.modes.objScale.icons[2]);
+					dataStorage.modes.objScale.state = 2;
+					showNotification("Changed to Centimeters", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 					break;
 				case 2:
-					showNotification("Changed to Meters", 1, normal, -20, null);
-					objScale = 3;
+					click.target.value = String.fromCharCode(dataStorage.modes.objScale.icons[3]);
+					dataStorage.modes.objScale.state = 3;
+					showNotification("Changed to Meters", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 					break;
 				case 3:
-					showNotification("Changed to Inches", 1, normal, -20, null);
-					objScale = 4;
+					click.target.value = String.fromCharCode(dataStorage.modes.objScale.icons[4]);
+					dataStorage.modes.objScale.state = 4;
+					showNotification("Changed to Inches", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 					break;
 				case 4:
-					showNotification("Changed to Feet", 1, normal, -20, null);
-					objScale = 5;
+					click.target.value = String.fromCharCode(dataStorage.modes.objScale.icons[5]);
+					dataStorage.modes.objScale.state = 5;
+					showNotification("Changed to Feet", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 					break;
 				case 5:
-					showNotification("Changed to Yards", 1, normal, -20, null);
-					objScale = 0;
+					click.target.value = String.fromCharCode(dataStorage.modes.objScale.icons[0]);
+					dataStorage.modes.objScale.state = 0;
+					showNotification("Changed to Yards", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 					break;
 			}
+			saveData("userData", dataStorage.modes);
+		}
+
+		//Toggle animation pane
+		else if (click.target.className === "btnAnimationPane" && click.button == 0) {
+			if (dataStorage.modes.animPane.state == 0) {
+				click.target.value = String.fromCharCode(dataStorage.modes.animPane.icons[1]);
+				dataStorage.modes.animPane.state = 1;
+				showNotification("Animation pane shown", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
+			}
+			else if (dataStorage.modes.animPane.state == 1) {
+				click.target.value = String.fromCharCode(dataStorage.modes.animPane.icons[0]);
+				dataStorage.modes.animPane.state = 0;
+				showNotification("Animation pane hidden", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
+			}
+			saveData("userData", dataStorage.modes);
 		}
 
 		//Viewport syncronization button
 		else if (click.target.className === "btnSyncViewport" && click.button == 0) {
-			(click.target.value !== String.fromCharCode("0xE628")) ? click.target.value = String.fromCharCode("0xE628") : click.target.value = String.fromCharCode("0xE627");
+			if (dataStorage.modes.syncViewports.state == 0) {
+				click.target.value = String.fromCharCode(ui.modes.syncViewports.icons[1]);
+				dataStorage.modes.syncViewports.state = 1;
+				showNotification("Viewport sync enabled", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
+			}
+			else if (dataStorage.modes.syncViewports.state == 1) {
+				click.target.value = String.fromCharCode(ui.modes.syncViewports.icons[0]);
+				dataStorage.modes.syncViewports.state = 0;
+				showNotification("Viewport sync disabled", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
+			}
+			saveData("userData", dataStorage.modes);
 		}
 
 		//Help button
 		else if (click.target.className === "btnHelp" && click.button == 0) {
-			toggleModalWindow("Help menu", "<b>Coming soon!</b>\n" + helpTextLoremIpsum, normal, -20);
+			toggleModalWindow("Help menu", "<b>Coming soon!</b>\n" + helpText, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 		}
 
 		//View warnings
 		else if (click.target.classList[0] === "btnWarnings" && click.button == 0) {
-			if (click.target.value !== String.fromCharCode("0xE86C")) {
-				click.target.value = String.fromCharCode("0xE86C");
-				click.target.classList.remove("error");
-				click.target.classList.add("ok");
+			if (dataStorage.modes.warnings.windowState == 0) {
+				click.target.value = String.fromCharCode(dataStorage.modes.warnings.icons[2]);
+				dataStorage.modes.warnings.windowState = 1;
+				//click.target.classList.remove("error");
+				//click.target.classList.add("ok");
 			}
-			else {
-				click.target.value = String.fromCharCode("0xE002");
-				click.target.classList.remove("ok");
-				click.target.classList.add("error");
+			else if (dataStorage.modes.warnings.windowState == 1) {
+				click.target.value = String.fromCharCode(dataStorage.modes.warnings.icons[dataStorage.modes.warnings.warningsCode]);
+				dataStorage.modes.warnings.windowState = 0;
+				//click.target.classList.remove("ok");
+				//click.target.classList.add("error");
 			}
-			toggleModalWindow("Mesh validation report", "<b>The list bellow is just a placeholder!</b><li>Doubles detected!</li><li>N-gon limit exceeding!</li>", normal, -20);
+			toggleModalWindow("Mesh validation report", "<b>The list bellow is just a placeholder!</b><li>Doubles detected!</li><li>N-gon limit exceeding!</li>", dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 		}
 
 		//// Right column buttons ////
+		//Rest view to default
+		else if (click.target.className === "btnResetView" && click.button == 0) {
+			showNotification("The view was reset to default", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
+		}
+
 		//Top View button click
     else if (click.target.className === "btnTopView" && click.button == 0) {
-      showNotification("Top view", 1, normal, -20, null);
-      angleY = -1.6;
-      angleX = 0;
+      showNotification("Top view", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
+      dataStorage.core.positions.angleY = -1.6;
+      dataStorage.core.positions.angleX = 0;
     }
 
 		//Front view Button cLick
     else if (click.target.className === "btnXview" && click.button == 0) {
-      showNotification("Front view", 1, normal, -20, null);
-      angleY = 0;
-      angleX = -1.6;
+      showNotification("Front view", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
+      dataStorage.core.positions.angleY = 0;
+      dataStorage.core.positions.angleX = -1.6;
     }
 
 		//Side view button lcick
     else if (click.target.className === "btnYview" && click.button == 0) {
-      showNotification("Side view", 1, normal, -20, null);
-      angleY = 0;
-      angleX = 0;
+      showNotification("Side view", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
+      dataStorage.core.positions.angleY = 0;
+      dataStorage.core.positions.angleX = 0;
     }
 
 		//Zoom buttons
@@ -616,6 +820,8 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     else if (click.target.className === "btnClose" && click.button == 0) {
       click.target.parentElement.style.visibility = "hidden";
       click.target.parentElement.style.opacity = 0;
+			dataStorage.modes.warnings.bind.value = String.fromCharCode(dataStorage.modes.warnings.icons[dataStorage.modes.warnings.warningsCode]);
+			dataStorage.modes.warnings.windowState = 0;
     }
   }, false);
 }
