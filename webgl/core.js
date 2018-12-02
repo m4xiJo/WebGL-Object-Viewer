@@ -267,6 +267,9 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   }
 
   // Configure WebGL
+	canvas.width = canvas.clientWidth;
+	canvas.height = canvas.clientHeight;
+	gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
   gl.clearColor(0.8, 0.8, 0.8, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.DEPTH_TEST);
@@ -361,7 +364,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   let worldMatrix = new Float32Array(16);
 
   mat4.identity(worldMatrix);
-  mat4.lookAt(viewMatrix, [0, 0, -6], [0, 0, 0], [0, 1, 0]);
+  mat4.lookAt(viewMatrix, [0, 0, -5], [0, 0, 0], [0, 1, 0]);
   mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.clientWidth / canvas.clientHeight, 1, 2000);
 
   gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
@@ -439,11 +442,11 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_em);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 
+
   //// Render update loop ////
   let updateLoop = function () {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
+		canvas.width = canvas.clientWidth;
+		canvas.height = canvas.clientHeight;
     if (dataStorage.modes.autoRotate.state == 1) dataStorage.core.positions.angleX = performance.now() / 6000 * Math.PI;
     if (dataStorage.modes.lightingMode.state == 1) {
       gl.uniform3f(ambLightIntensityUniformLocation, 0.2, 0.2, 0.2);
@@ -473,6 +476,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     dataStorage.core.fpsViewer.fpsViewerObj.innerText = parseInt(dataStorage.core.fpsViewer.fpsCount / (dataStorage.core.time.currentTime - dataStorage.core.time.startTime) * 1000);
     dataStorage.core.fpsViewer.fpsCount++;
     requestAnimationFrame(updateLoop);
+		//console.log(canvas.clientHeight / canvas.clientWidth * canvas.clientWidth);
   }
   requestAnimationFrame(updateLoop);
 
