@@ -240,7 +240,6 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
 	function loadData(slotName) {
 		let loadedData = JSON.parse(localStorage.getItem(slotName));
 		for (item in loadedData) {
-			console.log(item);
 			dataStorage.modes[item].state = loadedData[item];
 		}
 	}
@@ -387,6 +386,10 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   mat4.identity(identityMatrix);
 
   //// Create Textures ////
+	// Solid texture
+	//let meshSolid = gl.createTexture();
+	//gl.bindTexture(gl.TEXTURE_2D, gl.ClearTexImage);
+
   // Albedo/Diffuse
   let meshTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, meshTexture);
@@ -463,14 +466,18 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
     gl.clearColor(0.8, 0.8, 0.8, 1.0);
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-    gl.bindTexture(gl.TEXTURE_2D, meshTexture);
-    gl.activeTexture(gl.TEXTURE0);
-    if (dataStorage.modes.viewMode.state == 0) gl.drawElements(gl.TRIANGLES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
+
+    if (dataStorage.modes.viewMode.state == 0) {
+			gl.drawElements(gl.TRIANGLES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+		}
     else if (dataStorage.modes.viewMode.state == 1) {
 			gl.drawElements(gl.LINES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
 		}
     else if (dataStorage.modes.viewMode.state == 2) {
 			gl.drawElements(gl.TRIANGLES, meshIndecies.length, gl.UNSIGNED_SHORT, 0);
+			gl.bindTexture(gl.TEXTURE_2D, meshTexture);
+			//gl.activeTexture(gl.TEXTURE0);
 		}
     dataStorage.core.time.currentTime = new Date().getTime();
     dataStorage.core.fpsViewer.fpsViewerObj.innerText = parseInt(dataStorage.core.fpsViewer.fpsCount / (dataStorage.core.time.currentTime - dataStorage.core.time.startTime) * 1000);
