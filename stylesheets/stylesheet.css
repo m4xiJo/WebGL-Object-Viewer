@@ -10,11 +10,19 @@
           url('../fonts/Material/MaterialIcons-Regular.ttf') format('truetype'),
           url('../fonts/Material/MaterialIcons-Regular.svg') format("svg")
       }
-
-      body, input {font-family: Agency FB;}
-      li {list-style: none;}
-      li:before{content: "\e315"; font-family: Material Icons}
-      .workArea {width: 640px; height: 480px; display: block; position:relative; border: solid 1px #9e9e9e; margin: auto;}
+      body, input {font-family: Agency FB}
+			fieldset {padding: 0; border-bottom: 1px solid black; border-right: 1px solid black; margin: 0px 1px 1px 0px;position: relative;}
+      li {list-style: none}
+      li:before {content: "\e315"; font-family: Material Icons}
+      .workArea {width: 640px; height: 480px; display: block; position:relative; border: solid 2px #b4b4b4; margin: auto}
+			.workArea:focus-within {border: 2px solid grey; outline: 0; border-radius: 3px}
+			.animationPane, .mapPane {width: 113px; background: #898888; z-index: 0; position: absolute; left: 20px; margin: 3px; border: 1px solid grey;opacity: 0.2; transition: 0.3s}
+			.animationPane:hover, .mapPane:hover {opacity: 1}
+			.mapPane .icon {position: absolute; font-family: Material Icons; right: 1px; top: 1px; user-select: none; opacity: 0.2}
+			select{width: 100%; height: 95%; background: none; border: none; font-weight: bold;direction: rtl;text-align: left}
+			select option{outline: 0; border: 1px solid grey; cursor: pointer}
+			.animationPane input[type="button"], .animationPane input[type="button"] input[type=button]:focus{display: inline-block !important; margin: 0 !important}
+			.animationPane.hidden, .mapPane.hidden {display: none !important}
       .viewport {z-index: 1;position: relative;height: 100%;width: 100%; transition: 0.2s}
       .viewport:hover {cursor: grab; box-shadow: black 0px 0px 8px}
       .viewport:active {cursor: grabbing; box-shadow: black 0px 0px 8px}
@@ -23,7 +31,7 @@
       .notification {position: absolute; z-index: 3; color: white; width: 100%; opacity: 0; visibility: hidden}
       .modal {position: absolute; z-index: 3; color: white; width: 100%; opacity: 0; visibility: hidden; transition: 0.2s}
       .modalTitle {padding: 0px 8px 1px 8px; display: block; font-weight: bold}
-      .modalContent {padding: 4px 14px 4px 14px;; display: block; background: white; color: black; font-size: small; border-bottom: 1px solid #7e7e7e; overflow-y: auto; max-height: 451px;}
+      .modalContent {padding: 4px 14px 4px 14px;; display: block; background: white; color: black; font-size: small; border-bottom: 1px solid #7e7e7e; overflow-y: auto; max-height: 451px}
       .notification a, {padding: 0px 8px 1px 8px; display: block}
       .notification:active {animation: fadein 1s}
       .btnClose {top: 0; right: 0; margin: 0; padding: 0 !important; margin: 0 !important; position: absolute}
@@ -31,6 +39,7 @@
       input[type=button], input[type=button]:focus {margin-top: 3px; border: 1px solid grey; outline: 0; padding: 1px 17px 0px 1px; display: block; width: 20px; cursor: pointer; opacity: 0.4; transition: 0.2s; font-family: Material Icons; font-size: 16px}
       input[type=button]:hover, input[type=range]:hover {opacity: 1}
       input[type="button"]:disabled {cursor: no-drop}
+			label, input[type="radio"] {cursor: pointer; outline: 0;}
       input::-moz-focus-inner {border: 0; outline: 0;}
       .FPS {text-shadow: 0px 0px 3px black; color: white; font-weight: normal; font-size: medium; display: block; text-align: right}
       .stats {text-shadow: 0px 0px 3px black; color: white; font-weight: normal; font-size: medium; display: block; text-align: left}

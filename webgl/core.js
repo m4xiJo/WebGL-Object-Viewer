@@ -150,25 +150,17 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
 				icons: ["0xe84d", "0xe036"],
 				bind: document.getElementsByClassName("btnRotation")[0]
 			},
-			mapWorkflow: {
-				state: 1,
-				icons: ["0xe55b", "0xe55b", "0xe55b"],
-				bind: document.getElementsByClassName("btnWorkflow")[0]
-			},
-			bumpNormal: {
-				state: 1,
-				icons: ["0xe80b", "0xe80b"],
-				bind: document.getElementsByClassName("btnBumpNormal")[0]
+			mapPane: {
+				state: 0,
+				states: [0, 0, 0, 0, 0],
+				icons: ["0xe55b", "0xe5c6"],
+				bind: document.getElementsByClassName("btnWorkflow")[0],
+				panelObj: document.getElementsByClassName("mapPane")[0]
 			},
 			shadingMode: {
 				state: 1,
 				icons: ["0xe3a4", "0xe3a5"],
 				bind: document.getElementsByClassName("btnShading")[0]
-			},
-			emissiveMap: {
-				state: 1,
-				icons: ["0xe3c0", "0xe436"],
-				bind: document.getElementsByClassName("btnEmissive")[0]
 			},
 			objScale: {
 				state: 0,
@@ -177,8 +169,9 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
 			},
 			animPane: {
 				state: 0,
-				icons: ["0xe84e", "0xe566"],
-				bind: document.getElementsByClassName("btnAnimationPane")[0]
+				icons: ["0xe566", "0xe5c6"],
+				bind: document.getElementsByClassName("btnAnimationPane")[0],
+				panelObj: document.getElementsByClassName("animationPane")[0]
 			},
 			syncViewports: {
 				state: 0,
@@ -364,7 +357,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
 
   mat4.identity(worldMatrix);
   mat4.lookAt(viewMatrix, [0, 0, -5], [0, 0, 0], [0, 1, 0]);
-  mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.clientWidth / canvas.clientHeight, 1, 2000);
+  mat4.perspective(projMatrix, toRadian(45), canvas.clientWidth / canvas.clientHeight, 1, 2000);
 
   gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
   gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
@@ -625,47 +618,19 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
 
 		//Switch workflow button
 		else if (click.target.className === "btnWorkflow" && click.button == 0) {
-			if (dataStorage.modes.mapWorkflow.state == 0) {
-				click.target.value = String.fromCharCode(dataStorage.modes.mapWorkflow.icons[1]);
-				dataStorage.modes.mapWorkflow.state = 1;
-				showNotification("Swithed to: Diffuse, Specular, Glossy workflow", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
+			if (dataStorage.modes.mapPane.state == 0) {
+				click.target.value = String.fromCharCode(dataStorage.modes.mapPane.icons[1]);
+				dataStorage.modes.mapPane.state = 1;
+				dataStorage.modes.mapPane.panelObj.classList.remove("hidden");
+				showNotification("Maps pane shown", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
-			else if (dataStorage.modes.mapWorkflow.state == 1) {
-				click.target.value = String.fromCharCode(dataStorage.modes.mapWorkflow.icons[0]);
-				dataStorage.modes.mapWorkflow.state = 0;
-				showNotification("Swithed to: Albedo, Metallic, Roughness workflow", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
+			else if (dataStorage.modes.mapPane.state == 1) {
+				click.target.value = String.fromCharCode(dataStorage.modes.mapPane.icons[0]);
+				dataStorage.modes.mapPane.state = 0;
+				dataStorage.modes.mapPane.panelObj.classList.add("hidden");
+				showNotification("Maps pane hidden", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
-			saveData("userData", dataStorage.modes);
-		}
-
-		//Bump/Normal button toggle
-		else if (click.target.className === "btnBumpNormal" && click.button == 0) {
-			if (dataStorage.modes.bumpNormal.state == 0) {
-				click.target.value = String.fromCharCode(dataStorage.modes.bumpNormal.icons[1]);
-				dataStorage.modes.bumpNormal.state = 1;
-				showNotification("Swithed to bump maps", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
-			}
-			else if (dataStorage.modes.bumpNormal.state == 1) {
-				click.target.value = String.fromCharCode(dataStorage.modes.bumpNormal.icons[0]);
-				dataStorage.modes.bumpNormal.state = 0;
-				showNotification("Swithed to normal maps", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
-			}
-			saveData("userData", dataStorage.modes);
-		}
-
-		//Toggle Emissive maps
-		else if (click.target.className === "btnEmissive" && click.button == 0) {
-			if (dataStorage.modes.emissiveMap.state == 1) {
-				click.target.value = String.fromCharCode(dataStorage.modes.emissiveMap.icons[0]);
-				dataStorage.modes.emissiveMap.state = 0;
-				showNotification("Emissive maps OFF", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
-			}
-			else if (dataStorage.modes.emissiveMap.state == 0) {
-				click.target.value = String.fromCharCode(dataStorage.modes.emissiveMap.icons[1]);
-				dataStorage.modes.emissiveMap.state = 1;
-				showNotification("Emissive maps ON", 1, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
-			}
-			saveData("userData", dataStorage.modes);
+			//saveData("userData", dataStorage.modes);
 		}
 
 		//Toggle shading button
@@ -725,11 +690,13 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
 			if (dataStorage.modes.animPane.state == 0) {
 				click.target.value = String.fromCharCode(dataStorage.modes.animPane.icons[1]);
 				dataStorage.modes.animPane.state = 1;
+				dataStorage.modes.animPane.panelObj.classList.remove("hidden");
 				showNotification("Animation pane shown", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
 			else if (dataStorage.modes.animPane.state == 1) {
 				click.target.value = String.fromCharCode(dataStorage.modes.animPane.icons[0]);
 				dataStorage.modes.animPane.state = 0;
+				dataStorage.modes.animPane.panelObj.classList.add("hidden");
 				showNotification("Animation pane hidden", 2, dataStorage.ui.colors.normal, dataStorage.ui.colors.colorMod);
 			}
 			saveData("userData", dataStorage.modes);
@@ -860,4 +827,10 @@ function parseMAX() {
 
 function parseFBX() {
 
+}
+
+//// Math functions (in future) ////
+
+function toRadian(number) {
+	return number * Math.PI/180;
 }
