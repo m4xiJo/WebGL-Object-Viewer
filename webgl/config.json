@@ -1,0 +1,97 @@
+{
+  "ui": {
+    "colors": {
+      "normal": "#5c5c5c",
+      "success": "#036f00",
+      "warning": "#808d00",
+      "error": "#ba0000",
+      "colorMod": -20
+    }
+  },
+  "modes": {
+    "lightingMode": {
+      "state": 1,
+      "icons": ["0xe3a8", "0xe3aa"],
+      "bind": "btnLitUnlit"
+    },
+    "viewMode": {
+      "state": 2,
+      "icons": ["0xe3a2", "0xe228", "0xe421"],
+      "bind": "btnViewMode"
+    },
+    "viewGrid": {
+      "state": 0,
+      "icons": ["0xe3eb", "0xe3ec"],
+      "bind": "btnGrid"
+    },
+    "autoRotate": {
+      "state": 1,
+      "icons": ["0xe84d", "0xe036"],
+      "bind": "btnRotation"
+    },
+    "mapPane": {
+      "state": 0,
+      "states": [0, 0, 0, 0, 0],
+      "icons": ["0xe55b", "0xe5c6"],
+      "bind": "btnWorkflow",
+      "panelObj": "mapPane"
+    },
+    "shadingMode": {
+      "state": 1,
+      "icons": ["0xe3a4", "0xe3a5"],
+      "bind": "btnShading"
+    },
+    "objScale": {
+      "state": 0,
+      "icons": ["0xe41c", "0xe41c", "0xe41c", "0xe41c", "0xe41c", "0xe41c"],
+      "bind": "btnScale"
+    },
+    "animPane": {
+      "state": 0,
+      "icons": ["0xe566", "0xe5c6"],
+      "bind": "btnAnimationPane",
+      "panelObj": "animationPane"
+    },
+    "syncViewports": {
+      "state": 0,
+      "icons": ["0xe628", "0xe627"],
+      "bind": "btnSyncViewport"
+    },
+    "warnings": {
+      "state": 0,
+      "windowState": 0,
+      "icons": ["0xe86c", "0xe002", "0xe417"],
+      "bind": "btnWarnings",
+      "warnings": {},
+      "warningsCode": 0
+    }
+  },
+  "core": {
+    "helpText": "helpText",
+    "time": {
+      "startTime": "new Date().getTime()",
+      "currentTime": null,
+      "timer": null
+    },
+    "fpsViewer": {
+      "fpsViewerObj": "FPS",
+      "fpsCount": 0
+    },
+    "meshInfo": {
+      "meshInfoObj": "stats",
+      "meshInfoString": ""
+    },
+    "positions": {
+      "angleY": 0,
+      "angleX": 0,
+      "zoomRatio": 0,
+      "mouseMoveX": 0,
+      "mouseMoveY": 0,
+      "isScrolling": null,
+      "isMoving": null
+    },
+    "grid": {
+      "vertexData": "[1.0 1.0 0.0 -1.0 1.0 0.0 1.0 -1.0 0.0 -1.0 -1.0 0.0]"
+    }
+  }
+}

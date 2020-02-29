@@ -1,42 +1,42 @@
 function runWebGL(meshPath, adPath, nbPath, smPath, grPath, emPath) {
   // Prepare Vertex shader
-  let vertexShader = [
-    "precision mediump float;",
-    "attribute vec3 vertPosition;",
-    "attribute vec2 vertTexCoord;",
-    "attribute vec3 vertNormal;",
-    "varying vec2 fragTexCoord;",
-    "varying vec3 fragNormal;",
-    "uniform mat4 world;",
-    "uniform mat4 view;",
-    "uniform mat4 proj;",
-    "void main() {",
-    "fragTexCoord = vertTexCoord;",
-    "fragNormal = (world * vec4(vertNormal, 0.0)).xyz;",
-    "gl_Position = proj * view * world * vec4(vertPosition, 1.0);",
-    "}",
-  ].join("");
+  let vertexShader = `#version 300 es
+    in vec3 vertPosition;
+    in vec2 vertTexCoord;
+    in vec3 vertNormal;
+    out vec2 fragTexCoord;
+    out vec3 fragNormal;
+    uniform mat4 world;
+    uniform mat4 view;
+    uniform mat4 proj;
+    void main() {
+      fragTexCoord = vertTexCoord;
+      fragNormal = (world * vec4(vertNormal, 0.0)).xyz;
+      gl_Position = proj * view * world * vec4(vertPosition, 1.0);
+    }
+  `;
 
   // Prepare Fragment shader
-  let fragmentShader = [
-    "precision mediump float;",
-    "struct directionalLight {",
-    "vec3 direction;",
-    "vec3 color;",
-    "};",
-    "varying vec2 fragTexCoord;",
-    "varying vec3 fragNormal;",
-    "uniform vec3 ambientLightIntensity;",
-    "uniform directionalLight sun;",
-    "uniform sampler2D sampler;",
-    "void main() {",
-    "vec3 surfaceNormal = normalize(fragNormal);",
-    "vec3 normSunDir = normalize(sun.direction);",
-    "vec4 texel = texture2D (sampler, fragTexCoord);",
-    "vec3 lightIntensity = ambientLightIntensity + sun.color * max(dot(fragNormal, normSunDir), 0.0);",
-    "gl_FragColor = vec4(texel.rgb * lightIntensity, texel.a);",
-    "}",
-  ].join("");
+  let fragmentShader = `#version 300 es
+    precision mediump float;
+    struct directionalLight {
+      vec3 direction;
+      vec3 color;
+    };
+    in vec2 fragTexCoord;
+    in vec3 fragNormal;
+    out vec4 fragColor;
+    uniform vec3 ambientLightIntensity;
+    uniform directionalLight sun;
+    uniform sampler2D sampler;
+    void main() {
+      vec3 surfaceNormal = normalize(fragNormal);
+      vec3 normSunDir = normalize(sun.direction);
+      vec4 texel = texture(sampler, fragTexCoord);
+      vec3 lightIntensity = ambientLightIntensity + sun.color * max(dot(fragNormal, normSunDir), 0.0);
+      fragColor = vec4(texel.rgb * lightIntensity, texel.a);
+    }
+  `;
 
   // Load Mesh
   loadFile(meshPath, function(meshErr, meshObj) {
@@ -50,6 +50,7 @@ function runWebGL(meshPath, adPath, nbPath, smPath, grPath, emPath) {
       loadFile(adPath, function(adErr, adObj) {
         if (adErr) console.error("Error getting mesh Albedo/Diffuse! " + adErr);
         else {
+          console.log(adObj);
           adPath = adObj;
           // Load Normal/Bump
           loadFile(nbPath, function(nbErr, nbObj) {
@@ -57,15 +58,15 @@ function runWebGL(meshPath, adPath, nbPath, smPath, grPath, emPath) {
             else nbPath = nbObj;
             // Load Specular/Metallic
             loadFile(smPath, function(smErr, smObj) {
-              if (smErr) console.error("Error getting mesh Specual/Metallic map! Skipping..." + smErr + " Skipping...");
+              if (smErr) console.error("Error getting mesh Specual/Metallic map! " + smErr + " Skipping...");
               else smPath = smObj;
               // Load Glossy/Rough
               loadFile(grPath, function(grErr, grObj) {
-                if (grErr) console.error("Error getting mesh Glossy/Roughness map! Skipping..." + grErr + " Skipping...");
+                if (grErr) console.error("Error getting mesh Glossy/Roughness map! " + grErr + " Skipping...");
                 else grPath = grObj;
                 // Load Emissive
                 loadFile(emPath, function(emErr, emObj) {
-                  if (emErr) console.error("Error getting mesh Emissive map! Skipping..." + emErr + " Skipping...");
+                  if (emErr) console.error("Error getting mesh Emissive map! " + emErr + " Skipping...");
                   else emPath = emObj;
                   execWebGL(vertexShader, fragmentShader, meshVertex, meshIndex, meshTexCoords, meshNormals, adPath, nbPath, smPath, grPath, emPath);
                 });
@@ -80,6 +81,7 @@ function runWebGL(meshPath, adPath, nbPath, smPath, grPath, emPath) {
 
 // File loader
 function loadFile(url, callback) {
+  if (url == null) return callback("URL was NULL!");
   // Load mesh files
   if (url.match(/\.(json|obj|dae|blend|fbx|3ds|max)/g)) {
     let request = new XMLHttpRequest();
@@ -115,6 +117,7 @@ function loadFile(url, callback) {
 function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshIndecies, meshTexCoords, meshNormals, texture_ad, texture_nb, texture_sm, texture_gr, texture_em) {
   //// Global variables ////
   //UI configuration
+console.log("Hellloo!");
   let helpText = "<p>Ea paulo intellegat omittantur sit, esse liber at qui, vix cu ludus volutpat. Cibo dicit nonumes has et, his ne lorem scripta scriptorem, sea ex oblique deseruisse argumentum. Eu dolorum consequuntur quo. Nonumy omnium pri ea. </p><p>Est ex recusabo delicata, imperdiet concludaturque id est. Option conclusionemque ne mei. Ex eam accumsan inimicus. Has nominavi voluptatum complectitur ad. Libris nemore ad qui, te his probo utroque. Eu meliore admodum eum. </p><p>Cu option feugiat dolorem per, per an tale legere. Oporteat vulputate cu eos, sonet virtute no mel. Eos altera animal oporteat et, id perfecto interpretaris qui. Putent dicunt maiorum an has, et duo atqui animal eligendi. Sale tamquam pericula quo eu, nostrud intellegat an est, ea usu vitae nominati. Dicam vocent dolorem pro ut, ea per iudico minimum, an simul aperiam malorum ius. Ei pro facer tritani, quodsi accusata eu qui. </p><p>Te mel dicant scribentur theophrastus, vis falli postulant constituam ad. Cum eu mnesarchum instructior. Malis putent petentium pro in, an est senserit elaboraret intellegebat, mei in mollis mediocritatem. Ad eum illud fugit. In suas homero nemore his. </p><p>Pro illum aliquip in, pri et affert iracundia. Simul melius nostrum eum ei, simul nostro invidunt qui in, ei omnium latine omittam duo. Pri an dicant lucilius aliquando, brute feugait adolescens pri eu, vel cu fabulas pertinacia. Mea noster delectus dignissim et, est ea illum intellegat. Epicurei philosophia id vim. </p><p>Oratio insolens ullamcorper ex has, ad ius solet ignota reprehendunt. Duo petentium erroribus at, quem nostrum ad his. Nam omnis posidonium ne, partem vocibus pri an, ius no nominati gubergren. Verear recteque philosophia ius cu, ad oblique propriae vel. </p><p>Vel dolor legendos salutandi et, vitae primis inimicus sed an. Ad sed omnis iracundia, facer nonumy saperet eu nec. Cu signiferumque mediocritatem vix. Vis id erant possim. In pro quidam labores. Ei sit oblique atomorum honestatis, quo mazim delicata cu, cu nibh graeci facilisi duo. </p><p>Ei vix magna malorum nominati. Hinc indoctum repudiare cu vix. Graeco vocent deseruisse nam eu. Ea cum suscipit elaboraret. At nulla tincidunt pri. </p><p>Ex pro consul sanctus, ea ullum ancillae facilisis pri. Ex pro quaeque honestatis, eam ad zril dictas, mei ponderum disputando id. Liber adversarium est te. Cibo impetus reprimique no quo, id eos viderer honestatis. Amet platonem consulatu ei cum, omnis assum eu est, vel cu suscipit facilisi. </p><p>Sea congue denique no, persius scaevola vel ne. Ut sit eius illum accusam, at volutpat abhorreant scriptorem per. Periculis theophrastus nec te, eam id commune omnesque, ius at mutat volumus nostrum. Vim stet impetus instructior ea, mei ea viderer torquatos. Et vero dicat timeam vis.</p>";
 
   let dataStorage = {
@@ -248,7 +251,7 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
 
   //Initialize and configure WebGL
   let canvas = document.getElementsByClassName("viewport")[0];
-  let gl = canvas.getContext("webgl");
+  let gl = canvas.getContext("webgl2");
 
   if (!gl) {
     console.log("WebGL is not supported, trying Experimental WebGL...");
@@ -380,62 +383,79 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
   // Solid texture
   //let meshSolid = gl.createTexture();
   //gl.bindTexture(gl.TEXTURE_2D, gl.ClearTexImage);
+  let meshTexture;
+  let meshNormalBump;
+  let meshSpecMetal;
+  let meshGlossRough;
+  let meshEmissive;
 
   // Albedo/Diffuse
-  let meshTexture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, meshTexture);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_ad);
-  gl.bindTexture(gl.TEXTURE_2D, null);
+  if (texture_ad) {
+    meshTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, meshTexture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_ad);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+  }
 
   // Normal/Bump
-  let meshNormalBump = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, meshNormalBump);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_nb);
-  gl.bindTexture(gl.TEXTURE_2D, null);
+  if (texture_nb) {
+    meshNormalBump = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, meshNormalBump);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_nb);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+  }
 
   // Specular/Metallic
-  let meshSpecMetal = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, meshSpecMetal);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_sm);
-  gl.bindTexture(gl.TEXTURE_2D, null);
+  if (texture_sm) {
+    meshSpecMetal = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, meshSpecMetal);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_sm);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+  }
 
   // Glossy/Rough
-  let meshGlossRough = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, meshGlossRough);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_gr);
-  gl.bindTexture(gl.TEXTURE_2D, null);
+  if (texture_gr) {
+    meshGlossRough = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, meshGlossRough);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_gr);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+  }
 
   // Emissive
-  let meshEmissive = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, meshEmissive);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_em);
-  gl.bindTexture(gl.TEXTURE_2D, null);
+  if (texture_em) {
+    meshEmissive = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, meshEmissive);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture_em);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+  }
 
+  //Set Mesh stats
+  //dataStorage.core.meshInfo.meshInfoObj.innerText = "ello world!";
 
   //// Render update loop ////
   let updateLoop = function() {
@@ -518,7 +538,6 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
     }
     dataStorage.core.positions.mouseMoveX = move.clientX;
     dataStorage.core.positions.mouseMoveY = move.clientY;
-
     if (move.clientX && move.buttons == 2)
       move.target.style.cursor = "move";
     window.clearTimeout(dataStorage.core.positions.isMoving);
@@ -533,10 +552,16 @@ function execWebGL(vertexShaderCode, fragmentShaderCode, meshVertecies, meshInde
       zoomSlider.value -= scroll.deltaY * 0.6;
       if (scroll.deltaY < 0) scroll.target.style.cursor = "zoom-in";
       if (scroll.deltaY > 0) scroll.target.style.cursor = "zoom-out";
-      window.clearTimeout(isScrolling);
-      isScrolling = setTimeout(function() {
-        scroll.target.style.cursor = null;
-      }, 200);
+      let isScrolling = null;
+      if (isScrolling != null) {
+        window.clearTimeout(isScrolling);
+        isScrolling = null;
+      }
+      else {
+        isScrolling = window.setTimeout(function() {
+          scroll.target.style.cursor = null;
+        }, 100);
+      }
     }
   }, false);
 

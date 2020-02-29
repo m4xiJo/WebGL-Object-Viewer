@@ -5,8 +5,10 @@
     <link rel="shortcut icon" type="image/ico" href="webgl/favicon.ico"/>
     <title>WebGL 3D Object Viewer</title>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css">
+    <script type="module" src="webgl/main.mjs"></script>
   </head>
-  <body onload="runWebGL('fixtures/json/Suzanne/Suzanne.json', 'fixtures/json/Suzanne/textures/Suzanne_tex.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png')" oncontextmenu="return false;">
+
+  <body oncontextmenu="return false;">
     <div tabindex="0" class="workArea" class="workArea">
       <div class="notification"><a class="notyTitle">Notification</a></div>
       <div class="modal"><a class="modalTitle">Title</a><input class="btnClose" type="button" value="&#xe5cd"><a class="modalContent"></a></div>
@@ -84,15 +86,14 @@
     </div>
     <br>
     <script src="webgl/gl-matrix.js"></script> <!-- Load Matlib -->
-    <script src="webgl/core.js"></script> <!-- Load WebGL Core -->
   </body>
 </html>
 
 
 <!-- The bellow code is optional and was meant just for the demo purposes -->
 <div style ="width: 640px; display:block; margin:auto;">
-  <input type="button" value="Load Teapot (.JSON)" style="font-family: Agency FB; width: auto; display: inline">
-  <input type="button" value="Load Monkey (.JSON)" style="font-family: Agency FB; width: auto; display: inline">
+  <input type="button" onclick="runWebGL('fixtures/json/Teapot/Teapot.json', 'fixtures/json/Teapot/textures/ceramic.jpg')" value="Load Teapot (.JSON)" style="font-family: Agency FB; width: auto; display: inline">
+  <input type="button" onclick="runWebGL('fixtures/json/Suzanne/Suzanne.json', 'fixtures/json/Suzanne/textures/Suzanne_tex.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png', 'fixtures/json/Cratebox/textures/crate1_normal.png')" value="Load Monkey (.JSON)" style="font-family: Agency FB; width: auto; display: inline">
   <input type="button" value="Load Duck (Collada .DAE)" style="font-family: Agency FB; width: auto; display: inline">
   <input type="button" value="Load Teapot (Wavefront .OBJ)" style="font-family: Agency FB; width: auto; display: inline">
   <input type="button" value="Load Jet (Autodesk .3DS)" style="font-family: Agency FB; width: auto; display: inline">
