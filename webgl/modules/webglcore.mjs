@@ -15,14 +15,25 @@ export class WebGLCore {
     this.gl.frontFace(this.gl.CCW);
     this.gl.cullFace(this.gl.BACK);
     this.vShader = vShader, this.fShader = fShader, this.mesh = mesh, this.texture = texture;
-    this.compVshader, this.compFshader;
-    this.program;
-    this.meshVertexBufferObj, this.texCoordBufferObj, this.meshIndexBufferObj, this.meshNormalBufferObj;
-    this.posAttrLocation, this.texCoordAttrLocation, this.normalAttrLocation;
-    this.world, this.proj, this.view;
-    this.xRotationMatrix, this.yRotationMatrix, this.identityMatrix;
-    this.light;
-    this.meshTexture;
+    this.compVshader = this.createShader("vertex", this.vShader);
+    this.compFshader = this.createShader("fragment", this.fShader);
+    this.program = this.createProgram(this.compVshader, this.compFshader);
+    this.meshVertexBufferObj = this.bindGPUbuffer("float32", this.mesh.vertex);
+    this.texCoordBufferObj = this.bindGPUbuffer("float32", this.mesh.texcoords);
+    this.meshIndexBufferObj = this.bindGPUbuffer("uint16", this.mesh.index);
+    this.meshNormalBufferObj = this.bindGPUbuffer("float32", this.mesh.normals);
+    this.posAttrLocation = this.setupAttributes(this.meshVertexBufferObj, this.program, "vertPosition", 3, 3);
+    this.texCoordAttrLocation = this.setupAttributes(this.texCoordBufferObj, this.program, "vertTexCoord", 2, 2);
+    this.normalAttrLocation = this.setupAttributes(this.meshNormalBufferObj, this.program, "vertNormal", 3, 3);
+    this.world = this.createWorld(this.program, "world");
+    this.proj = this.createProjection(this.program, "proj");
+    this.view = this.createView(this.program, "view");
+    this.xRotationMatrix = new Float32Array(16);
+    this.yRotationMatrix = new Float32Array(16);
+    this.identityMatrix = new Float32Array(16);
+    this.light = this.createLighting(this.program);
+    this.meshTexture = this.createTexture(this.texture);
+    mat4.identity(this.identityMatrix);
   }
 
   createShader(sType, sCode) {
@@ -124,27 +135,11 @@ export class WebGLCore {
     this.canvas.width = this.canvas.clientWidth;
     this.canvas.height = this.canvas.clientHeight;
   }
+}
 
-  initialize() {
-    this.compVshader = this.createShader("vertex", this.vShader);
-    this.compFshader = this.createShader("fragment", this.fShader);
-    this.program = this.createProgram(this.compVshader, this.compFshader);
-    this.meshVertexBufferObj = this.bindGPUbuffer("float32", this.mesh.vertex);
-    this.texCoordBufferObj = this.bindGPUbuffer("float32", this.mesh.texcoords);
-    this.meshIndexBufferObj = this.bindGPUbuffer("uint16", this.mesh.index);
-    this.meshNormalBufferObj = this.bindGPUbuffer("float32", this.mesh.normals);
-    this.posAttrLocation = this.setupAttributes(this.meshVertexBufferObj, this.program, "vertPosition", 3, 3);
-    this.texCoordAttrLocation = this.setupAttributes(this.texCoordBufferObj, this.program, "vertTexCoord", 2, 2);
-    this.normalAttrLocation = this.setupAttributes(this.meshNormalBufferObj, this.program, "vertNormal", 3, 3);
-    this.world = this.createWorld(this.program, "world");
-    this.proj = this.createProjection(this.program, "proj");
-    this.view = this.createView(this.program, "view");
-    this.xRotationMatrix = new Float32Array(16);
-    this.yRotationMatrix = new Float32Array(16);
-    this.light = this.createLighting(this.program);
-    this.identityMatrix = new Float32Array(16);
-    mat4.identity(this.identityMatrix);
-    this.meshTexture = this.createTexture(this.texture);
+export class Actions extends WebGLCore {
+  constructor(vShader, fShader, mesh, texture) {
+    super(vShader, fShader, mesh, texture);
   }
 
   lightingToggle(state) {
@@ -184,13 +179,5 @@ export class WebGLCore {
 
   zooming() {
 
-  }
-
-
-}
-
-export class Actions extends WebGLCore {
-  constructor(gl, light) {
-    super(gl, light);
   }
 }
