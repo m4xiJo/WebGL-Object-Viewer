@@ -1,22 +1,22 @@
-export class Storage {
-  constructor() {
+export class Statesaver {
+  constructor(config) {
   }
 
-  //loadData("userData"); //Call saved data load
   saveData(slotName, data) {
     if (!localStorage.getItem(slotName)) localStorage.setItem(slotName, "null");
     let constructedData = {};
-    for (item in data) {
+    for (let item in data) {
       constructedData[item] = item;
       constructedData[item] = data[item].state;
     }
     localStorage.setItem(slotName, JSON.stringify(constructedData));
   }
 
-  loadData(slotName) {
+  loadData(slotName, data) {
     let loadedData = JSON.parse(localStorage.getItem(slotName));
-    for (item in loadedData) {
-      dataStorage.modes[item].state = loadedData[item];
+    for (let item in loadedData) {
+      data.modes[item].state = loadedData[item];
     }
+    return(data);
   }
 }

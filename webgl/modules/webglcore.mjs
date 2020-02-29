@@ -2,24 +2,11 @@ import { Maths } from './maths.mjs';
 var maths = new Maths;
 
 export class WebGLCore {
-  constructor(config, canvas, vShaderCode, fShaderCode, meshVertecies, meshTexCoords, meshIndecies, meshNormals, texture_ad) {
-    //Initialize and configure WebGL
-    this.config = config;
-    this.vShaderCode = vShaderCode;
-    this.fShaderCode = fShaderCode;
-    this.meshVertecies = meshVertecies;
-    this.meshTexCoords = meshTexCoords;
-    this.meshIndecies = meshIndecies;
-    this.meshNormals = meshNormals;
-    this.texure_ad = texture_ad;
-    //console.log(this.texture);
+  constructor(vShader, fShader, mesh, texture) {
     this.canvas = document.getElementsByClassName("viewport")[0];
     this.gl = this.canvas.getContext("webgl2");
     if (!this.gl) return alert("Couldn't initialize WebGL, this might be because your browser doesn't support it!");
-
-    // Configure WebGL
-    this.canvas.width = this.canvas.clientWidth;
-    this.canvas.height = this.canvas.clientHeight;
+    this.canvas.width = this.canvas.clientWidth, this.canvas.height = this.canvas.clientHeight;
     this.gl.viewport(0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
     this.gl.clearColor(0.8, 0.8, 0.8, 1.0);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
@@ -27,162 +14,183 @@ export class WebGLCore {
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.frontFace(this.gl.CCW);
     this.gl.cullFace(this.gl.BACK);
+    this.vShader = vShader, this.fShader = fShader, this.mesh = mesh, this.texture = texture;
+    this.compVshader, this.compFshader;
+    this.program;
+    this.meshVertexBufferObj, this.texCoordBufferObj, this.meshIndexBufferObj, this.meshNormalBufferObj;
+    this.posAttrLocation, this.texCoordAttrLocation, this.normalAttrLocation;
+    this.world, this.proj, this.view;
+    this.xRotationMatrix, this.yRotationMatrix, this.identityMatrix;
+    this.light;
+    this.meshTexture;
+  }
 
-    // Create shaders
-    this.vertexShader = this.gl.createShader(this.gl.VERTEX_SHADER);
-    this.fragmentShader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
+  createShader(sType, sCode) {
+    let shader;
+    if (sType == "vertex") shader = this.gl.createShader(this.gl.VERTEX_SHADER);
+    else if (sType == "fragment") shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
+    else return console.error("No shader type was set!");
+    this.gl.shaderSource(shader, sCode);
+    this.gl.compileShader(shader);
+    if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) return console.error("ERROR failed to compile Vertex Shader", this.gl.getShaderInfoLog(shader));
+    return shader;
+  }
 
-    //Define shader source
-    this.gl.shaderSource(this.vertexShader, vShaderCode);
-    this.gl.shaderSource(this.fragmentShader, fShaderCode);
+  createProgram(vShader, fShader) {
+    let program = this.gl.createProgram();
+    this.gl.attachShader(program, vShader);
+    this.gl.attachShader(program, fShader);
+    this.gl.linkProgram(program);
+    if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) return console.error("ERROR failed to link this.program!", this.gl.getProgramInfoLog(program));
+    this.gl.validateProgram(program);
+    if (!this.gl.getProgramParameter(program, this.gl.VALIDATE_STATUS)) return console.error("ERROR validating this.program!", this.gl.getProgramInfoLog(program));
+    return program;
+  }
 
-    // Compile vertex shader
-    this.gl.compileShader(this.vertexShader);
-    if (!this.gl.getShaderParameter(this.vertexShader, this.gl.COMPILE_STATUS)) return console.error("ERROR failed to compile Vertex Shader", this.gl.getShaderInfoLog(this.vertexShader));
+  bindGPUbuffer(arrType, buffData) {
+    let bufferObj = this.gl.createBuffer();
+    if (arrType == "uint16") {
+      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferObj);
+      this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(buffData), this.gl.STATIC_DRAW);
+    }
+    else if (arrType == "float32")  {
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferObj);
+      this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(buffData), this.gl.STATIC_DRAW);
+    }
+    else return console.error("No array type was set!");
+    return bufferObj;
+  }
 
-    // Compile fragment shader
-    this.gl.compileShader(this.fragmentShader);
-    if (!this.gl.getShaderParameter(this.fragmentShader, this.gl.COMPILE_STATUS)) return console.error("ERROR failed to compile Fragment Shader", this.gl.getShaderInfoLog(this.fragmentShader));
+  setupAttributes(buffObj, program, name, size, offsetMp) {
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffObj);
+    let attribLoc = this.gl.getAttribLocation(program, name);
+    this.gl.vertexAttribPointer(attribLoc, size, this.gl.FLOAT, this.gl.FALSE, offsetMp * Float32Array.BYTES_PER_ELEMENT, 0);
+    this.gl.enableVertexAttribArray(attribLoc);
+    return attribLoc;
+  }
 
-    // Create this.program & validate it
-    this.program = this.gl.createProgram();
-    this.gl.attachShader(this.program, this.vertexShader);
-    this.gl.attachShader(this.program, this.fragmentShader);
-    this.gl.linkProgram(this.program);
-    if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) return console.error("ERROR failed to link this.program!", this.gl.getProgramInfoLog(this.program));
-    this.gl.validateProgram(this.program);
-    if (!this.gl.getProgramParameter(this.program, this.gl.VALIDATE_STATUS)) return console.error("ERROR validating this.program!", this.gl.getProgramInfoLog(this.program));
+  createWorld(program, uniformName) {
+    this.gl.useProgram(program);
+    let matWorldUniformLocation = this.gl.getUniformLocation(program, uniformName);
+    let worldMatrix = new Float32Array(16);
+    mat4.identity(worldMatrix);
+    this.gl.uniformMatrix4fv(matWorldUniformLocation, this.gl.FALSE, worldMatrix);
+    return {worldMatrix: worldMatrix, worldUniformLoc: matWorldUniformLocation};
+  }
 
-    // GPU buffer
-    this.meshVertexBufferObj = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.meshVertexBufferObj);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.meshVertecies), this.gl.STATIC_DRAW);
+  createView(program, uniformName) {
+    this.gl.useProgram(program);
+    let matViewUniformLocation = this.gl.getUniformLocation(program, uniformName);
+    let viewMatrix = new Float32Array(16);
+    mat4.lookAt(viewMatrix, [0, 0, -5], [0, 0, 0], [0, 1, 0]);
+    this.gl.uniformMatrix4fv(matViewUniformLocation, this.gl.FALSE, viewMatrix);
+    return {viewMatrix: viewMatrix, viewUniformLoc: matViewUniformLocation};
+  }
 
-    this.texCoordBufferObj = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBufferObj);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.meshTexCoords), this.gl.STATIC_DRAW);
+  createProjection(program, uniformName) {
+    this.gl.useProgram(program);
+    let matProjUniformLocation = this.gl.getUniformLocation(program, uniformName);
+    let projMatrix = new Float32Array(16);
+    mat4.perspective(projMatrix, maths.toRadian(45), this.canvas.clientWidth / this.canvas.clientHeight, 1, 2000);
+    this.gl.uniformMatrix4fv(matProjUniformLocation, this.gl.FALSE, projMatrix);
+    return {projMatrix: projMatrix, projUniformLoc: matProjUniformLocation};
+  }
 
-    this.meshIndexBufferObj = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.meshIndexBufferObj);
-    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.meshIndecies), this.gl.STATIC_DRAW);
+  createLighting(program) {
+    this.gl.useProgram(program);
+    let ambLightIntensityUniformLocation = this.gl.getUniformLocation(program, "ambientLightIntensity");
+    let sunlightDirUniformLocation = this.gl.getUniformLocation(program, "sun.direction");
+    let sunlightIntUniformLocation = this.gl.getUniformLocation(program, "sun.color");
+    //this.this.gl.uniform3f(this.ambLightIntensityUniformLocation, 0.2, 0.2, 0.2);
+    this.gl.uniform3f(sunlightDirUniformLocation, 3.0, 4.0, -2.0);
+    //this.this.gl.uniform3f(this.sunlightIntUniformLocation, 1.0, 1.0, 1.0);
+    return {ambLightIntUniformLoc: ambLightIntensityUniformLocation, sunDirUniformLoc: sunlightDirUniformLocation, sunIntUniformLoc: sunlightIntUniformLocation};
+  }
 
-    this.meshNormalBufferObj = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.meshNormalBufferObj);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.meshNormals), this.gl.STATIC_DRAW);
-
-    //// Setup attributes ////
-    // Location of attribute, Number of elements per attribute, Type of elements, Normalized?, Size of individual vertex, Offset from the beginning of a single vertex to this attribute
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.meshVertexBufferObj);
-    this.posAttrLocation = this.gl.getAttribLocation(this.program, "vertPosition");
-    this.gl.vertexAttribPointer(this.posAttrLocation, 3, this.gl.FLOAT, this.gl.FALSE, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
-    this.gl.enableVertexAttribArray(this.posAttrLocation);
-
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBufferObj);
-    this.texCoordAttrLocation = this.gl.getAttribLocation(this.program, "vertTexCoord");
-    this.gl.vertexAttribPointer(this.texCoordAttrLocation, 2, this.gl.FLOAT, this.gl.FALSE, 2 * Float32Array.BYTES_PER_ELEMENT, 0);
-    this.gl.enableVertexAttribArray(this.texCoordAttrLocation);
-
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.meshNormalBufferObj);
-    this.normalAttrLocation = this.gl.getAttribLocation(this.program, "vertNormal");
-    this.gl.vertexAttribPointer(this.normalAttrLocation, 3, this.gl.FLOAT, this.gl.TRUE, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
-    this.gl.enableVertexAttribArray(this.normalAttrLocation);
-
-    // Tell which this.program is active
-    this.gl.useProgram(this.program);
-    this.matWorldUniformLocation = this.gl.getUniformLocation(this.program, "world");
-    this.matViewUniformLocation = this.gl.getUniformLocation(this.program, "view");
-    this.matProjUniformLocation = this.gl.getUniformLocation(this.program, "proj");
-
-    this.projMatrix = new Float32Array(16);
-    this.viewMatrix = new Float32Array(16);
-    this.worldMatrix = new Float32Array(16);
-
-    mat4.identity(this.worldMatrix);
-    mat4.lookAt(this.viewMatrix, [0, 0, -5], [0, 0, 0], [0, 1, 0]);
-    mat4.perspective(this.projMatrix, maths.toRadian(45), this.canvas.clientWidth / this.canvas.clientHeight, 1, 2000);
-
-    this.gl.uniformMatrix4fv(this.matWorldUniformLocation, this.gl.FALSE, this.worldMatrix);
-    this.gl.uniformMatrix4fv(this.matViewUniformLocation, this.gl.FALSE, this.viewMatrix);
-    this.gl.uniformMatrix4fv(this.matProjUniformLocation, this.gl.FALSE, this.projMatrix);
-
-    this.xRotationMatrix = new Float32Array(16);
-    this.yRotationMatrix = new Float32Array(16);
-
-    // Lighting
-    this.gl.useProgram(this.program);
-    this.ambLightIntensityUniformLocation = this.gl.getUniformLocation(this.program, "ambientLightIntensity");
-    this.sunlightDirUniformLocation = this.gl.getUniformLocation(this.program, "sun.direction");
-    this.sunlightIntUniformLocation = this.gl.getUniformLocation(this.program, "sun.color");
-    //this.gl.uniform3f(this.ambLightIntensityUniformLocation, 0.2, 0.2, 0.2);
-    this.gl.uniform3f(this.sunlightDirUniformLocation, 3.0, 4.0, -2.0);
-    //this.gl.uniform3f(this.sunlightIntUniformLocation, 1.0, 1.0, 1.0);
-
-    //Identity matrix
-    this.identityMatrix = new Float32Array(16);
-    mat4.identity(this.identityMatrix);
-
-    this.meshTexture = this.gl.createTexture();
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.meshTexture);
+  createTexture(texture) {
+    let meshTexture = this.gl.createTexture();
+    this.gl.bindTexture(this.gl.TEXTURE_2D, meshTexture);
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, texture_ad);
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, texture);
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-
-    //requestAnimationFrame(this.updateLoop);
+    return meshTexture;
   }
 
-  lighting() {
-
+  checkAspectRatio() {
+    this.canvas.width = this.canvas.clientWidth;
+    this.canvas.height = this.canvas.clientHeight;
   }
 
-  createTexture() {
-      let meshTexture = this.gl.createTexture();
-      this.gl.bindTexture(this.gl.TEXTURE_2D, meshTexture);
-      this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-      this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, texture_ad);
+  initialize() {
+    this.compVshader = this.createShader("vertex", this.vShader);
+    this.compFshader = this.createShader("fragment", this.fShader);
+    this.program = this.createProgram(this.compVshader, this.compFshader);
+    this.meshVertexBufferObj = this.bindGPUbuffer("float32", this.mesh.vertex);
+    this.texCoordBufferObj = this.bindGPUbuffer("float32", this.mesh.texcoords);
+    this.meshIndexBufferObj = this.bindGPUbuffer("uint16", this.mesh.index);
+    this.meshNormalBufferObj = this.bindGPUbuffer("float32", this.mesh.normals);
+    this.posAttrLocation = this.setupAttributes(this.meshVertexBufferObj, this.program, "vertPosition", 3, 3);
+    this.texCoordAttrLocation = this.setupAttributes(this.texCoordBufferObj, this.program, "vertTexCoord", 2, 2);
+    this.normalAttrLocation = this.setupAttributes(this.meshNormalBufferObj, this.program, "vertNormal", 3, 3);
+    this.world = this.createWorld(this.program, "world");
+    this.proj = this.createProjection(this.program, "proj");
+    this.view = this.createView(this.program, "view");
+    this.xRotationMatrix = new Float32Array(16);
+    this.yRotationMatrix = new Float32Array(16);
+    this.light = this.createLighting(this.program);
+    this.identityMatrix = new Float32Array(16);
+    mat4.identity(this.identityMatrix);
+    this.meshTexture = this.createTexture(this.texture);
+  }
+
+  lightingToggle(state) {
+    if(state == 1) {
+      this.gl.uniform3f(this.light.ambLightIntUniformLoc, 0.2, 0.2, 0.2);
+      this.gl.uniform3f(this.light.sunIntUniformLoc, 1.0, 1.0, 1.0);
+    }
+    if(state == 0) {
+      this.gl.uniform3f(this.light.ambLightIntUniformLoc, 1.0, 1.0, 1.0);
+      this.gl.uniform3f(this.light.sunIntUniformLoc, 0.0, 0.0, 0.0);
+    }
+  }
+
+  rotationToggle(config, state) {
+    if (state == 1) {
+      config.core.positions.angleX = performance.now() / 6000 * Math.PI;
+      mat4.rotate(this.yRotationMatrix, this.identityMatrix, config.core.positions.angleX, [0, 1, 0]);
+      mat4.rotate(this.xRotationMatrix, this.identityMatrix, config.core.positions.angleY, [1, 0, 0]);
+      mat4.mul(this.world.worldMatrix, this.yRotationMatrix, this.xRotationMatrix);
+      this.gl.uniformMatrix4fv(this.world.worldUniformLoc, this.gl.FALSE, this.world.worldMatrix);
+    }
+  }
+
+  viewModeToggle(state)  {
+    if(state == 0) {
+      this.gl.drawElements(this.gl.TRIANGLES, this.mesh.index.length, this.gl.UNSIGNED_SHORT, 0);
       this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    } else if(state == 1) {
+      this.gl.drawElements(this.gl.LINES, this.mesh.index.length, this.gl.UNSIGNED_SHORT, 0);
+    }
+    else if(state == 2) {
+      this.gl.drawElements(this.gl.TRIANGLES, this.mesh.index.length, this.gl.UNSIGNED_SHORT, 0);
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.meshTexture);
+      //gl.activeTexture(gl.TEXTURE0);
+    }
   }
 
-  updateLoop() {
-      //this.canvas.width = this.canvas.clientWidth;
-      //this.canvas.height = this.canvas.clientHeight;
-      if (this.config.modes.autoRotate.state == 1) this.config.core.positions.angleX = performance.now() / 6000 * Math.PI;
-      if (this.config.modes.lightingMode.state == 1) {
-        this.gl.uniform3f(this.ambLightIntensityUniformLocation, 0.2, 0.2, 0.2);
-        this.gl.uniform3f(this.sunlightIntUniformLocation, 1.0, 1.0, 1.0);
-      } else {
-        this.gl.uniform3f(this.ambLightIntensityUniformLocation, 1.0, 1.0, 1.0);
-        this.gl.uniform3f(this.sunlightIntUniformLocation, 0.0, 0.0, 0.0);
-      }
+  zooming() {
 
-      mat4.rotate(this.yRotationMatrix, this.identityMatrix, this.config.core.positions.angleX, [0, 1, 0]);
-      mat4.rotate(this.xRotationMatrix, this.identityMatrix, this.config.core.positions.angleY, [1, 0, 0]);
-      mat4.mul(this.worldMatrix, this.yRotationMatrix, this.xRotationMatrix);
-      this.gl.uniformMatrix4fv(this.matWorldUniformLocation, this.gl.FALSE, this.worldMatrix);
-      this.gl.clearColor(0.8, 0.8, 0.8, 1.0);
-      this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT);
+  }
 
-      if (this.config.modes.viewMode.state == 0) {
-        this.gl.drawElements(this.gl.TRIANGLES, this.meshIndecies.length, this.gl.UNSIGNED_SHORT, 0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-      } else if (this.config.modes.viewMode.state == 1) {
-        this.gl.drawElements(this.gl.LINES, this.meshIndecies.length, this.gl.UNSIGNED_SHORT, 0);
-      } else if (this.config.modes.viewMode.state == 2) {
-        this.gl.drawElements(this.gl.TRIANGLES, this.meshIndecies.length, this.gl.UNSIGNED_SHORT, 0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.meshTexture);
-        //this.gl.activeTexture(this.gl.TEXTURE0);
-      }
-      this.config.core.time.currentTime = new Date().getTime();
-      //this.config.core.fpsViewer.fpsViewerObj.innerText = parseInt(this.config.core.fpsViewer.fpsCount / (this.config.core.time.currentTime - this.config.core.time.startTime) * 1000);
-      this.config.core.fpsViewer.fpsCount++;
-      requestAnimationFrame(this.updateLoop.bind(this));
-      //console.log(canvas.clientHeight / canvas.clientWidth * canvas.clientWidth);
+
+}
+
+export class Actions extends WebGLCore {
+  constructor(gl, light) {
+    super(gl, light);
   }
 }
