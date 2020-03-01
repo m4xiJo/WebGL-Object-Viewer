@@ -113,7 +113,7 @@ export class WebGLCore {
     let sunlightDirUniformLocation = this.gl.getUniformLocation(program, "sun.direction");
     let sunlightIntUniformLocation = this.gl.getUniformLocation(program, "sun.color");
     //this.this.gl.uniform3f(this.ambLightIntensityUniformLocation, 0.2, 0.2, 0.2);
-    this.gl.uniform3f(sunlightDirUniformLocation, 3.0, 4.0, -2.0);
+    this.gl.uniform3f(sunlightDirUniformLocation, -3.0, 4.0, 1.0);
     //this.this.gl.uniform3f(this.sunlightIntUniformLocation, 1.0, 1.0, 1.0);
     return {ambLightIntUniformLoc: ambLightIntensityUniformLocation, sunDirUniformLoc: sunlightDirUniformLocation, sunIntUniformLoc: sunlightIntUniformLocation};
   }
@@ -145,7 +145,7 @@ export class Actions extends WebGLCore {
   lightingToggle(state) {
     if(state == 1) {
       this.gl.uniform3f(this.light.ambLightIntUniformLoc, 0.2, 0.2, 0.2);
-      this.gl.uniform3f(this.light.sunIntUniformLoc, 1.0, 1.0, 1.0);
+      this.gl.uniform3f(this.light.sunIntUniformLoc, 2.0, 2.0, 2.0);
     }
     if(state == 0) {
       this.gl.uniform3f(this.light.ambLightIntUniformLoc, 1.0, 1.0, 1.0);
@@ -153,14 +153,12 @@ export class Actions extends WebGLCore {
     }
   }
 
-  rotationToggle(config, state) {
-    if (state == 1) {
-      config.core.positions.angleX = performance.now() / 6000 * Math.PI;
-      mat4.rotate(this.yRotationMatrix, this.identityMatrix, config.core.positions.angleX, [0, 1, 0]);
-      mat4.rotate(this.xRotationMatrix, this.identityMatrix, config.core.positions.angleY, [1, 0, 0]);
+  rotationToggle(angleX, angleY, state) {
+
+      mat4.rotate(this.yRotationMatrix, this.identityMatrix, angleX, [0, 1, 0]);
+      mat4.rotate(this.xRotationMatrix, this.identityMatrix, angleY, [1, 0, 0]);
       mat4.mul(this.world.worldMatrix, this.yRotationMatrix, this.xRotationMatrix);
       this.gl.uniformMatrix4fv(this.world.worldUniformLoc, this.gl.FALSE, this.world.worldMatrix);
-    }
   }
 
   viewModeToggle(state)  {
@@ -177,7 +175,17 @@ export class Actions extends WebGLCore {
     }
   }
 
-  zooming() {
+  zooming(zoomRatio) {
+    //console.log(zoomRatio);
+    mat4.lookAt(this.view.viewMatrix, [0, 0, zoomRatio], [0, 0, 0], [0, 1, 0]);
+    this.gl.uniformMatrix4fv(this.view.viewUniformLoc, this.gl.FALSE, this.view.viewMatrix);
+  }
 
+  rotation(angleX, angleY, state) {
+    if (state == 1) angleX = performance.now() / 6000 * Math.PI;
+    mat4.rotate(this.yRotationMatrix, this.identityMatrix, angleX + 0, [0, 1, 0]);
+    mat4.rotate(this.xRotationMatrix, this.identityMatrix, angleY + 300, [1, 0, 0]);
+    mat4.mul(this.world.worldMatrix, this.yRotationMatrix, this.xRotationMatrix);
+    this.gl.uniformMatrix4fv(this.world.worldUniformLoc, this.gl.FALSE, this.world.worldMatrix);
   }
 }

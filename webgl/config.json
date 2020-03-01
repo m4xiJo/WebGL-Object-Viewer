@@ -11,54 +11,67 @@
   "modes": {
     "lightingMode": {
       "state": 1,
+      "states": [0, 1],
       "icons": ["0xe3a8", "0xe3aa"],
       "bind": "btnLitUnlit"
     },
     "viewMode": {
       "state": 2,
+      "states": [0, 1, 2],
       "icons": ["0xe3a2", "0xe228", "0xe421"],
       "bind": "btnViewMode"
     },
     "viewGrid": {
       "state": 0,
+      "states": [0, 1],
       "icons": ["0xe3eb", "0xe3ec"],
       "bind": "btnGrid"
     },
     "autoRotate": {
-      "state": 1,
+      "state": 0,
+      "states": [0, 1],
       "icons": ["0xe84d", "0xe036"],
       "bind": "btnRotation"
     },
-    "mapPane": {
+    "mapSelector": {
       "state": 0,
-      "states": [0, 0, 0, 0, 0],
+      "states": [0, 1],
       "icons": ["0xe55b", "0xe5c6"],
       "bind": "btnWorkflow",
-      "panelObj": "mapPane"
+      "panelObj": {
+          "bind": "mapPane",
+          "state": [1,2,3],
+          "states": [[0,2,3],[2,3,4],[2,3,4]]
+      }
     },
     "shadingMode": {
       "state": 1,
+      "states": [0, 1],
       "icons": ["0xe3a4", "0xe3a5"],
       "bind": "btnShading"
     },
     "objScale": {
       "state": 0,
+      "states": [0, 1, 2, 3, 4, 5],
       "icons": ["0xe41c", "0xe41c", "0xe41c", "0xe41c", "0xe41c", "0xe41c"],
       "bind": "btnScale"
     },
     "animPane": {
       "state": 0,
+      "states": [0, 1],
       "icons": ["0xe566", "0xe5c6"],
       "bind": "btnAnimationPane",
       "panelObj": "animationPane"
     },
     "syncViewports": {
       "state": 0,
+      "states": [0, 1],
       "icons": ["0xe628", "0xe627"],
       "bind": "btnSyncViewport"
     },
-    "warnings": {
+    "btnWarnings": {
       "state": 0,
+      "states": [0, 1, 2],
       "windowState": 0,
       "icons": ["0xe86c", "0xe002", "0xe417"],
       "bind": "btnWarnings",

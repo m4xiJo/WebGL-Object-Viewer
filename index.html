@@ -21,15 +21,15 @@
         <input class="btnYview" type="button" value="&#xe5c8" name="Y View">
         <input class="btnZoomIn" type="button" value="&#xe8ff" name="Zoom In">
         <input class="btnZoomOut" type="button" value="&#xe900" name="Zoom Out">
-        <input class="zoomSlider" type="range" orient="vertical" min="1" max="100" value="50">
+        <input class="zoomSlider" type="range" orient="vertical" min="3" max="100" value="4">
         <input class="btnFullScreen" type="button" value="&#xe5d0" name="Full Screen">
       </div>
       <div class="verticalPanelLeft">
         <a class="stats">V:0 F:0 T:0</a>
-        <input class="btnLitUnlit" type="button" value="" name="Toggle Lit/Unlit">
-        <input class="btnViewMode" type="button" value="" name="Toggle Solid/Wireframe/Texture">
-        <input class="btnGrid" type="button" value="" name="Toggle Grid">
-        <input class="btnRotation" type="button" value="" name="Toggle Auto Rotation">
+        <input class="lightingMode" type="button" value="" name="Toggle Lit/Unlit">
+        <input class="viewMode" type="button" value="" name="Toggle Solid/Wireframe/Texture">
+        <input class="viewGrid" type="button" value="" name="Toggle Grid">
+        <input class="autoRotate" type="button" value="" name="Toggle Auto Rotation">
 				<div class="mapPane hidden">
 					<fieldset>
 						<a class="icon">&#xe410</a>
@@ -61,9 +61,9 @@
 						<label><input type="radio" name="EmissionMaps">Off</label><br>
 					</fieldset>
 				</div>
-        <input class="btnWorkflow" type="button" value="" name="Toggle between Albedo, Metallic, Roughness & Diffuse, Specular, Glossy workflow">
-        <input class="btnShading" type="button" value="" name="Toggle shading between flat and smooth">
-        <input class="btnScale" type="button" value="" name="Toggle scale">
+        <input class="mapSelector" type="button" value="" name="Toggle between Albedo, Metallic, Roughness & Diffuse, Specular, Glossy workflow">
+        <input class="shadingMode" type="button" value="" name="Toggle shading between flat and smooth">
+        <input class="objScale" type="button" value="" name="Toggle scale">
 				<div class="animationPane hidden">
 					<input class="loopAnimation" type="button" value="&#xe040" name="Loop animation toggle">
 					<input class="playPauseAnim" type="button" value="&#xe037" name="Play/Pause animation">
@@ -77,8 +77,8 @@
 						<option value="prone">prone</option>
 					</select>
 				</div>
-				<input class="btnAnimationPane" type="button" value="" name="Toggle animation pane">
-        <input class="btnSyncViewport" type="button" value="" name="Sync Viewpors (only if multiple)" disabled>
+				<input class="animPane" type="button" value="" name="Toggle animation pane">
+        <input class="syncViewports" type="button" value="" name="Sync Viewpors (only if multiple)" disabled>
         <input class="btnHelp" type="button" value="&#xe8fd" name="Open help">
         <input class="btnWarnings" type="button" value="" name="Warning list">
       </div>
