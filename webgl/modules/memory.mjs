@@ -1,4 +1,4 @@
-export class Statesaver {
+export class Memory {
   constructor(config) {
   }
 
@@ -7,7 +7,7 @@ export class Statesaver {
     let constructedData = {};
     for (let item in data) {
       constructedData[item] = item;
-      constructedData[item] = data[item].state;
+      constructedData[item] = data[item].currstate;
     }
     localStorage.setItem(slotName, JSON.stringify(constructedData));
   }
@@ -15,7 +15,7 @@ export class Statesaver {
   loadData(slotName, data) {
     let loadedData = JSON.parse(localStorage.getItem(slotName));
     for (let item in loadedData) {
-      data.modes[item].state = loadedData[item];
+      data.modes[item].currstate = loadedData[item];
     }
     return(data);
   }

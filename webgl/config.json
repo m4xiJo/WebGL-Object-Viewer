@@ -10,73 +10,101 @@
   },
   "modes": {
     "lightingMode": {
-      "state": 1,
-      "states": [0, 1],
-      "icons": ["0xe3a8", "0xe3aa"],
-      "bind": "btnLitUnlit"
+      "currstate": 1,
+      "states": [
+        {"state": 0, "icon": "brightness_1", "message": "Switched to unlit"},
+        {"state": 1, "icon": "brightness_7", "message": "Switched to lit"}
+      ]
     },
     "viewMode": {
-      "state": 2,
-      "states": [0, 1, 2],
-      "icons": ["0xe3a2", "0xe228", "0xe421"],
-      "bind": "btnViewMode"
+      "currstate": 2,
+      "states": [
+        {"state": 0, "icon": "texture", "message": "Switched to textured"},
+        {"state": 1, "icon": "border_all", "message": "Switched to wireframe"},
+        {"state": 2, "icon": "blur_circular", "message": "Switched to solid"}
+      ]
     },
-    "viewGrid": {
-      "state": 0,
-      "states": [0, 1],
-      "icons": ["0xe3eb", "0xe3ec"],
-      "bind": "btnGrid"
+    "gridMode": {
+      "currstate": 0,
+      "states": [
+        {"state": 0, "icon": "grid_off", "message": "Grid is off"},
+        {"state": 1, "icon": "grid_on", "message": "Grid is on"}
+      ]
     },
-    "autoRotate": {
-      "state": 0,
-      "states": [0, 1],
-      "icons": ["0xe84d", "0xe036"],
-      "bind": "btnRotation"
+    "rotateMode": {
+      "currstate": 0,
+      "states": [
+        {"state": 0, "icon": "pause_circle_outline", "message": "Auto rotation off"},
+        {"state": 1, "icon": "3d_rotation", "message": "Auto rotation on"}
+      ]
     },
-    "mapSelector": {
-      "state": 0,
-      "states": [0, 1],
-      "icons": ["0xe55b", "0xe5c6"],
-      "bind": "btnWorkflow",
-      "panelObj": {
-          "bind": "mapPane",
-          "state": [1,2,3],
-          "states": [[0,2,3],[2,3,4],[2,3,4]]
+    "mapMode": {
+      "currstate": 0,
+      "states": [
+        {"state": 0, "icon": "map"},
+        {"state": 1, "icon": "arrow_forward"}
+      ],
+      "contextMenu": {
+        "name": "mapPane",
+        "selectGroups": [
+          {"name": "texture", "icon": "image", "currstate": 0, "objects": [{"text": "Albedo"}, {"text": "Diffuse"}]},
+          {"name": "details", "icon": "landscape", "currstate": 0, "objects": [{"text": "Bump"}, {"text": "Normal"}, {"text": "Displacement"}, {"text": "Off"}]},
+          {"name": "reflection", "icon": "photo_filter", "currstate": 0, "objects": [{"text": "Roughtness"}, {"text": "Glossy"}, {"text": "Off"}]},
+          {"name": "metals", "icon": "flare", "currstate": 0, "objects": [{"text": "Metallic"}, {"text": "Specular"}, {"text": "Off"}]},
+          {"name": "emission", "icon": "wb_iridescent", "currstate": 0, "objects": [{"text": "Emissive"}, {"text": "Off"}]}
+        ]
       }
     },
     "shadingMode": {
-      "state": 1,
-      "states": [0, 1],
-      "icons": ["0xe3a4", "0xe3a5"],
-      "bind": "btnShading"
+      "currstate": 1,
+      "states": [
+        {"state": 0, "icon": "blur_off", "message": "Switched to flat shading"},
+        {"state": 1, "icon": "blur_on", "message": "Switched to smooth shading"}
+      ]
     },
-    "objScale": {
-      "state": 0,
-      "states": [0, 1, 2, 3, 4, 5],
-      "icons": ["0xe41c", "0xe41c", "0xe41c", "0xe41c", "0xe41c", "0xe41c"],
-      "bind": "btnScale"
+    "scaleMode": {
+      "currstate": 1,
+      "states": [
+        {"state": 0, "icon": "filter_1", "message": "Switched to mm"},
+        {"state": 1, "icon": "filter_2", "message": "Switched to cm"},
+        {"state": 2, "icon": "filter_3", "message": "Switched to km"},
+        {"state": 3, "icon": "filter_4", "message": "Switched to ft"},
+        {"state": 4, "icon": "filter_5", "message": "Switched to in"},
+        {"state": 5, "icon": "filter_6", "message": "Switched to :D"}
+      ]
     },
-    "animPane": {
-      "state": 0,
-      "states": [0, 1],
-      "icons": ["0xe566", "0xe5c6"],
-      "bind": "btnAnimationPane",
+    "animMode": {
+      "currstate": 0,
+      "states": [
+        {"state": 0, "icon": "directions_run"},
+        {"state": 1, "icon": "arrow_forward"}
+      ],
       "panelObj": "animationPane"
     },
-    "syncViewports": {
-      "state": 0,
-      "states": [0, 1],
-      "icons": ["0xe628", "0xe627"],
-      "bind": "btnSyncViewport"
+    "syncMode": {
+      "currstate": 0,
+      "states": [
+        {"state": 0, "icon": "sync_disabled"},
+        {"state": 1, "icon": "sync"}
+      ]
     },
-    "btnWarnings": {
-      "state": 0,
-      "states": [0, 1, 2],
+    "help": {
+      "currstate": 0,
       "windowState": 0,
-      "icons": ["0xe86c", "0xe002", "0xe417"],
-      "bind": "btnWarnings",
-      "warnings": {},
-      "warningsCode": 0
+      "msgList": {},
+      "states": [
+        {"state": 0, "icon": "help_outline"},
+        {"state": 1, "icon": "remove_red_eye"}
+      ]
+    },
+    "warnings": {
+      "currstate": 0,
+      "windowState": 0,
+      "msgList": {},
+      "states": [
+        {"state": 0, "icon": "warning"},
+        {"state": 1, "icon": "remove_red_eye"}
+      ]
     }
   },
   "core": {
@@ -104,7 +132,7 @@
       "isMoving": null
     },
     "grid": {
-      "vertexData": "[1.0 1.0 0.0 -1.0 1.0 0.0 1.0 -1.0 0.0 -1.0 -1.0 0.0]"
+      "vertexData": [[1.0, 1.0, 0.0, -1.0], [1.0, 0.0, 1.0, -1.0], [0.0, -1.0, -1.0, 0.0]]
     }
   }
 }

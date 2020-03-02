@@ -17,10 +17,11 @@ export class WheelScroll {
       this.scrollEl.value -= scroll.deltaY * 0.6;
       if (scroll.deltaY < 0) scroll.target.style.cursor = "zoom-in";
       if (scroll.deltaY > 0) scroll.target.style.cursor = "zoom-out";
+      if(this.isScrolling) window.clearTimeout(this.isScrolling);
         this.isScrolling = window.setTimeout(() => {
           scroll.target.style.cursor = null;
         }, 100);
-      window.clearTimeout(this.isScrolling);
+
       this.config.core.positions.zoomRatio = this.scrollEl.value;
     }
   }
@@ -29,7 +30,7 @@ export class WheelScroll {
 export class MouseMove {
   constructor(config) {
     this.config = config;
-    this.scrollEvent = document.addEventListener("mousemove", (move) => {
+    this.scrollEvent = document.getElementsByClassName('workArea')[0].addEventListener("mousemove", (move) => {
       this.moved(move);
     }, false);
   }
@@ -49,7 +50,9 @@ export class MouseMove {
 }
 
 export class SpecButtons {
-  constructor(config) {
+  constructor(config, memory) {
+    this.memory = memory;
+    this.modals = new Modals();
     this.config = config;
     this.loadStates();
     this.clickEvent = document.addEventListener("click", (click) => {
@@ -59,31 +62,37 @@ export class SpecButtons {
 
   loadStates() {
     for (let mode in this.config.modes) {
-      let currentState = this.config.modes[mode].state;
-      let icons = this.config.modes[mode].icons;
+      let currentState = this.config.modes[mode].currstate;
+      let context = this.config.modes[mode].contextMenu || null;
+      let allStates = this.config.modes[mode].states;
       let object = document.getElementsByClassName(mode)[0] || document.getElementById(mode);
-      if(object) object.value = String.fromCharCode(icons[currentState]);
+      if(object) object.value = allStates[currentState].icon;
+      if(currentState == 1 && context) this.modals.generateContext(context, document.getElementsByClassName(mode)[0]);
+
     }
   }
 
   pressed(click) {
-    let buttonid = click.target.className || click.target.id;
+    let buttonid = click.target.className.split(' ')[0] || click.target.id;
     let button = document.getElementsByClassName(buttonid)[0] || document.getElementById(buttonid) || null;
-    if(button == null) throw "Element was not found!";
-    let currentState = this.config.modes[buttonid].state;
+    if(this.config.modes[buttonid] == null) return;
+    let currentState = this.config.modes[buttonid].currstate;
     let allStates = this.config.modes[buttonid].states;
-    let statesLenth = this.config.modes[buttonid].states.length;
-    if(currentState < statesLenth - 1) currentState = allStates[currentState + 1];
+    let statesLength = this.config.modes[buttonid].states.length;
+    if(currentState < statesLength - 1) currentState++;
     else currentState = 0;
-    let icon = this.config.modes[buttonid].icons[currentState] || "X";
-    click.target.value = String.fromCharCode(icon);
-    this.config.modes[buttonid].state = currentState;
+    click.target.value = allStates[currentState].icon;
+    this.config.modes[buttonid].currstate = currentState;
+    if(allStates[currentState].message) this.modals.showNotification(allStates[currentState].message, 2, this.config.ui.colors.normal, 20);
+    if(this.config.modes[buttonid].contextMenu) this.modals.generateContext(this.config.modes[buttonid].contextMenu, click.target);
+    this.memory.saveData("slot1", this.config.modes);
     return this.config;
   }
 }
 
 class Modals {
   constuctor() {
+    this.timer;
   }
 
   modifyColor(color, percent) {
@@ -93,10 +102,10 @@ class Modals {
   }
 
   showNotification(text, time, color, percent) {
-    clearTimeout(this.config.core.time.timer);
+    clearTimeout(this.timer);
     document.getElementsByClassName("notyTitle")[0].innerText = text;
-    document.getElementsByClassName("notification")[0].setAttribute("style", "animation: fadein " + time + "s; background: " + color + "; border-bottom: 1px solid " + modifyColor(color, percent));
-    this.config.core.time.timer = setTimeout(() => {
+    document.getElementsByClassName("notification")[0].setAttribute("style", "animation: fadein " + time + "s; background: " + color + "; border-bottom: 1px solid " + this.modifyColor(color, percent));
+    this.timer = setTimeout(() => {
       document.getElementsByClassName("notification")[0].style.animation = null;
     }, time * 1000);
   }
@@ -113,8 +122,38 @@ class Modals {
       document.getElementsByClassName("modalContent")[0].innerHTML = null;
     }
   }
-}
 
+  generateContext(menuData, target) {
+    let exists = document.getElementsByClassName(menuData.name)[0] || document.getElementById(menuData.name) || null;
+    if (exists) return exists.remove();
+    let ctxtContainer = document.createElement("div");
+    ctxtContainer.id = menuData.name;
+    if(menuData.selectGroups) {
+      for (let group in menuData.selectGroups) {
+        let fieldSet = document.createElement("fieldset");
+        let a = document.createElement("a");
+        a.className = "icon";
+        a.innerText = menuData.selectGroups[group].icon;
+        fieldSet.appendChild(a);
+          for (let option in menuData.selectGroups[group].objects) {
+            let label = document.createElement("label");
+            let input = document.createElement("input");
+            input.type = "radio";
+            input.name = menuData.selectGroups[group].name;
+            input.id = '';
+            label.appendChild(input);
+            label.innerHTML += menuData.selectGroups[group].objects[option].text;
+            let br = document.createElement("br");
+            fieldSet.appendChild(label);
+            fieldSet.appendChild(br);
+        }
+        ctxtContainer.appendChild(fieldSet);
+      }
+      var area = document.getElementsByClassName("verticalPanelLeft")[0];
+      area.insertBefore(ctxtContainer, target);
+    }
+  }
+}
 
 //
 // export class GUIButtons extends GUIEvents {

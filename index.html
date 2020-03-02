@@ -11,65 +11,34 @@
   <body oncontextmenu="return false;">
     <div tabindex="0" class="workArea" class="workArea">
       <div class="notification"><a class="notyTitle">Notification</a></div>
-      <div class="modal"><a class="modalTitle">Title</a><input class="btnClose" type="button" value="&#xe5cd"><a class="modalContent"></a></div>
+      <div class="modal"><a class="modalTitle">Title</a><input class="btnClose" type="button" value="close"><a class="modalContent"></a></div>
       <div class="verticalPanelRight">
         <a class="FPS">0</a>
-				<input class="btnResetView" type="button" value="&#xe929" name="Reset View">
-				<input class="btnCamMode" type="button" value="&#xe8ba" name="Reset View">
-        <input class="btnTopView" type="button" value="&#xe5db" name="Top View">
-        <input class="btnXview" type="button" value="&#xe5c4" name="X View">
-        <input class="btnYview" type="button" value="&#xe5c8" name="Y View">
-        <input class="btnZoomIn" type="button" value="&#xe8ff" name="Zoom In">
-        <input class="btnZoomOut" type="button" value="&#xe900" name="Zoom Out">
+				<input class="btnResetView" type="button" value="" name="Reset View">
+				<input class="btnCamMode" type="button" value="" name="Reset View">
+        <input class="btnTopView" type="button" value="" name="Top View">
+        <input class="btnXview" type="button" value="" name="X View">
+        <input class="btnYview" type="button" value="" name="Y View">
+        <input class="btnZoomIn" type="button" value="" name="Zoom In">
+        <input class="btnZoomOut" type="button" value="" name="Zoom Out">
         <input class="zoomSlider" type="range" orient="vertical" min="3" max="100" value="4">
-        <input class="btnFullScreen" type="button" value="&#xe5d0" name="Full Screen">
+        <input class="btnFullScreen" type="button" value="" name="Full Screen">
       </div>
       <div class="verticalPanelLeft">
         <a class="stats">V:0 F:0 T:0</a>
-        <input class="lightingMode" type="button" value="" name="Toggle Lit/Unlit">
-        <input class="viewMode" type="button" value="" name="Toggle Solid/Wireframe/Texture">
-        <input class="viewGrid" type="button" value="" name="Toggle Grid">
-        <input class="autoRotate" type="button" value="" name="Toggle Auto Rotation">
-				<div class="mapPane hidden">
-					<fieldset>
-						<a class="icon">&#xe410</a>
-						<label><input type="radio" name="TexMaps">Albedo</label><br>
-						<label><input type="radio" name="TexMaps">Diffuse</label><br>
-					</fieldset>
-					<fieldset>
-						<a class="icon">&#xe80b</a>
-						<label><input type="radio" name="DetailMaps">Bump</label><br>
-						<label><input type="radio" name="DetailMaps">Normal</label><br>
-						<label><input type="radio" name="DetailMaps">Displacement</label><br>
-						<label><input type="radio" name="DetailMaps">Off</label><br>
-					</fieldset>
-					<fieldset>
-						<a class="icon">&#xe3e4</a>
-						<label><input type="radio" name="ReflectionMaps">Roughness</label><br>
-						<label><input type="radio" name="ReflectionMaps">Glossy</label><br>
-						<label><input type="radio" name="ReflectionMaps">Off</label><br>
-					</fieldset>
-					<fieldset>
-						<a class="icon">&#xe3e9</a>
-						<label><input type="radio" name="MetalMaps">Metallic</label><br>
-						<label><input type="radio" name="MetalMaps">Specular</label><br>
-						<label><input type="radio" name="MetalMaps">Off</label><br>
-					</fieldset>
-					<fieldset>
-						<a class="icon">&#xe436</a>
-						<label><input type="radio" name="EmissionMaps">Emissive</label><br>
-						<label><input type="radio" name="EmissionMaps">Off</label><br>
-					</fieldset>
-				</div>
-        <input class="mapSelector" type="button" value="" name="Toggle between Albedo, Metallic, Roughness & Diffuse, Specular, Glossy workflow">
-        <input class="shadingMode" type="button" value="" name="Toggle shading between flat and smooth">
-        <input class="objScale" type="button" value="" name="Toggle scale">
+        <input class="lightingMode btn" type="button" value="" name="Toggle Lit/Unlit">
+        <input class="viewMode btn" type="button" value="" name="Toggle Solid/Wireframe/Texture">
+        <input class="gridMode btn" type="button" value="" name="Toggle Grid">
+        <input class="rotateMode btn" type="button" value="" name="Toggle Auto Rotation">
+        <input class="mapMode btn" type="button" value="" name="Toggle between Albedo, Metallic, Roughness & Diffuse, Specular, Glossy workflow">
+        <input class="shadingMode btn" type="button" value="" name="Toggle shading between flat and smooth">
+        <input class="scaleMode btn" type="button" value="" name="Toggle scale">
 				<div class="animationPane hidden">
-					<input class="loopAnimation" type="button" value="&#xe040" name="Loop animation toggle">
-					<input class="playPauseAnim" type="button" value="&#xe037" name="Play/Pause animation">
-					<input class="stopAnimation" type="button" value="&#xe047" name="Stop animation">
-					<input class="nextAnimation" type="button" value="&#xe045" name="Previous animation">
-					<input class="nextAnimation" type="button" value="&#xe044" name="Next animation">
+					<input class="loopAnimation btn" type="button" value="repeat" name="Loop animation toggle">
+					<input class="playPauseAnim btn" type="button" value="play_arrow" name="Play/Pause animation">
+					<input class="stopAnimation btn" type="button" value="stop" name="Stop animation">
+					<input class="nextAnimation btn" type="button" value="skip_previous" name="Previous animation">
+					<input class="nextAnimation btn" type="button" value="skip_next" name="Next animation">
 					<select name="animations" size="4">
 						<option value="run">run</option>
 						<option value="jump">jump</option>
@@ -77,15 +46,15 @@
 						<option value="prone">prone</option>
 					</select>
 				</div>
-				<input class="animPane" type="button" value="" name="Toggle animation pane">
-        <input class="syncViewports" type="button" value="" name="Sync Viewpors (only if multiple)" disabled>
-        <input class="btnHelp" type="button" value="&#xe8fd" name="Open help">
-        <input class="btnWarnings" type="button" value="" name="Warning list">
+				<input class="animMode btn" type="button" value="" name="Toggle animation pane">
+        <input class="syncMode btn" type="button" value="" name="Sync Viewpors (only if multiple)" disabled>
+        <input class="help btn" type="button" value="" name="Open help">
+        <input class="warnings btn" type="button" value="" name="Warning list">
       </div>
       <canvas class="viewport">HTML5 is not supported, cannot draw a 3D viewport!</canvas>
     </div>
     <br>
-    <script src="webgl/gl-matrix.js"></script> <!-- Load Matlib -->
+    <script src="webgl/modules/gl-matrix.js"></script> <!-- Load Matlib -->
   </body>
 </html>
 
