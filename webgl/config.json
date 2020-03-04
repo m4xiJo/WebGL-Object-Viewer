@@ -19,9 +19,9 @@
     "viewMode": {
       "currstate": 2,
       "states": [
-        {"state": 0, "icon": "texture", "message": "Switched to textured"},
+        {"state": 0, "icon": "blur_circular", "message": "Switched to solid"},
         {"state": 1, "icon": "border_all", "message": "Switched to wireframe"},
-        {"state": 2, "icon": "blur_circular", "message": "Switched to solid"}
+        {"state": 2, "icon": "texture", "message": "Switched to textured"}
       ]
     },
     "gridMode": {
