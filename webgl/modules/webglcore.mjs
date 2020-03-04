@@ -1,5 +1,4 @@
 import { Maths } from './maths.mjs';
-//import ('./gl-matrix.js');
 var maths = new Maths;
 
 export class WebGLCore {
@@ -34,6 +33,7 @@ export class WebGLCore {
     this.identityMatrix = new Float32Array(16);
     this.light = this.createLighting(this.program);
     this.meshTexture = this.createTexture(this.texture);
+    this.solidMeshTexture = this.createSolidTexture("#808080", 512, 512);
     mat4.identity(this.identityMatrix);
   }
 
@@ -128,9 +128,20 @@ export class WebGLCore {
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, texture);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    //this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     return meshTexture;
   }
+
+  createSolidTexture(color, w, h) {
+    var canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, w, h);
+    return this.createTexture(canvas);
+  }
+
 
   checkAspectRatio() {
     this.canvas.width = this.canvas.clientWidth;
@@ -155,7 +166,6 @@ export class Actions extends WebGLCore {
   }
 
   rotationToggle(angleX, angleY, state) {
-
       mat4.rotate(this.yRotationMatrix, this.identityMatrix, angleX, [0, 1, 0]);
       mat4.rotate(this.xRotationMatrix, this.identityMatrix, angleY, [1, 0, 0]);
       mat4.mul(this.world.worldMatrix, this.yRotationMatrix, this.xRotationMatrix);
@@ -165,9 +175,11 @@ export class Actions extends WebGLCore {
   viewModeToggle(state)  {
     if(state == 0) {
       this.gl.drawElements(this.gl.TRIANGLES, this.mesh.index.length, this.gl.UNSIGNED_SHORT, 0);
-      this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.solidMeshTexture);
+
     } else if(state == 1) {
       this.gl.drawElements(this.gl.LINES, this.mesh.index.length, this.gl.UNSIGNED_SHORT, 0);
+      this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     }
     else if(state == 2) {
       this.gl.drawElements(this.gl.TRIANGLES, this.mesh.index.length, this.gl.UNSIGNED_SHORT, 0);
@@ -177,7 +189,6 @@ export class Actions extends WebGLCore {
   }
 
   zooming(zoomRatio) {
-    //console.log(zoomRatio);
     mat4.lookAt(this.view.viewMatrix, [0, 0, zoomRatio], [0, 0, 0], [0, 1, 0]);
     this.gl.uniformMatrix4fv(this.view.viewUniformLoc, this.gl.FALSE, this.view.viewMatrix);
   }
