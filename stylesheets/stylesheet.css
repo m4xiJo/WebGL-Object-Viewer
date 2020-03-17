@@ -64,8 +64,8 @@
 
         transform: translate(20%, -20%);
         z-index: 2;
-        opacity: 1 !important;
-        visibility: visible !important;
+        opacity: 1;
+        visibility: visible;
         width: 100%;
       }
 
