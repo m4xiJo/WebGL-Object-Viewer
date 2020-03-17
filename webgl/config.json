@@ -105,6 +105,63 @@
         {"state": 0, "icon": "warning"},
         {"state": 1, "icon": "remove_red_eye"}
       ]
+    },
+    "fullScreen": {
+      "currstate": 0,
+      "windowState": 0,
+      "states": [
+        {"state": 0, "icon": "fullscreen_exit"},
+        {"state": 1, "icon": "fullscreen"}
+      ]
+    },
+    "resetView": {
+      "currstate": 0,
+      "windowState": 0,
+      "states": [
+        {"state": 0, "icon": "settings_backup_restore"}
+      ]
+    },
+    "camMode": {
+      "currstate": 0,
+      "windowState": 0,
+      "states": [
+        {"state": 0, "icon": "camera"}
+      ]
+    },
+    "topView": {
+      "currstate": 0,
+      "windowState": 0,
+      "states": [
+        {"state": 0, "icon": "vertical_align_bottom"}
+      ]
+    },
+    "xView": {
+      "currstate": 0,
+      "windowState": 0,
+      "states": [
+        {"state": 0, "icon": "arrow_forward"}
+      ]
+    },
+    "yView": {
+      "currstate": 0,
+      "windowState": 0,
+      "states": [
+        {"state": 0, "icon": "call_received"}
+      ]
+    },
+    "zoomIn": {
+      "currstate": 0,
+      "windowState": 0,
+      "states": [
+        {"state": 0, "icon": "zoom_in"}
+      ]
+    },
+    "zoomOut": {
+      "currstate": 0,
+      "windowState": 0,
+      "states": [
+        {"state": 0, "icon": "zoom_out"}
+      ]
     }
   },
   "core": {
