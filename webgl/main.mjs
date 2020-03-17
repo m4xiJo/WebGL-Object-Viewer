@@ -1,5 +1,5 @@
 import { WebGLCore, Actions } from './modules/webglcore.mjs';
-import { SpecButtons, WheelScroll, MouseMove } from './modules/guicore.mjs';
+import { SpecButtons, WheelScroll, MouseMove, Modals } from './modules/guicore.mjs';
 import { Loader } from './modules/fileloader.mjs';
 import { Memory } from './modules/memory.mjs';
 
@@ -11,13 +11,15 @@ import { Memory } from './modules/memory.mjs';
   let buttons = new SpecButtons(config, memory);
   new WheelScroll(config);
   new MouseMove(config);
-
+  let modals = new Modals();
+  modals.toggleLoader();
   let vShader = await loader.loadFile("webgl/shaders/vertex.glsl").catch(console.error);
   let fShader = await loader.loadFile("webgl/shaders/fragment.glsl").catch(console.error);
   let mesh = await loader.loadMesh("fixtures/json/Suzanne/Suzanne.json").catch(console.error);
   let texture = await loader.loadFile("fixtures/json/Suzanne/textures/Suzanne_tex.png").catch(console.error);
   let webgl = await new Actions(vShader, fShader, mesh, texture);
   let startTime = new Date().getTime();
+  modals.toggleLoader();
 
   let fpsCount = 0;
   window.onfocus = () => {

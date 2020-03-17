@@ -90,7 +90,7 @@ export class SpecButtons {
   }
 }
 
-class Modals {
+export class Modals {
   constuctor() {
     this.timer;
   }
@@ -153,7 +153,27 @@ class Modals {
       area.insertBefore(ctxtContainer, target);
     }
   }
+
+  toggleLoader(text) {
+    let loader = document.getElementById("loading");
+    let workArea = document.getElementsByClassName("workArea")[0];
+
+    if (loader.style.visibility == "visible") {
+      console.log("Hiding!");
+      loader.style.visibility = "hidden";
+      workArea.style.filer = "blur(1px)";
+      loader.style.opacity = 0;
+    }
+    else {
+      console.log("Showing!");
+      loader.style.visibility = "visible";
+      workArea.style.filter = "blur(0px)";
+      loader.style.opacity = 1;
+    }
+  }
 }
+
+
 
 //
 // export class GUIButtons extends GUIEvents {
