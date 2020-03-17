@@ -161,13 +161,13 @@ export class Modals {
     if (loader.style.visibility == "visible") {
       console.log("Hiding!");
       loader.style.visibility = "hidden";
-      workArea.style.filer = "blur(1px)";
+      workArea.style.filter = "blur(0px)";
       loader.style.opacity = 0;
     }
     else {
       console.log("Showing!");
       loader.style.visibility = "visible";
-      workArea.style.filter = "blur(0px)";
+      workArea.style.filter = "blur(1px)";
       loader.style.opacity = 1;
     }
   }
