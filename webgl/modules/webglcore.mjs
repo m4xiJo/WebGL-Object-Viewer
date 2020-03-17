@@ -165,13 +165,6 @@ export class Actions extends WebGLCore {
     }
   }
 
-  rotationToggle(angleX, angleY, state) {
-      mat4.rotate(this.yRotationMatrix, this.identityMatrix, angleX, [0, 1, 0]);
-      mat4.rotate(this.xRotationMatrix, this.identityMatrix, angleY, [1, 0, 0]);
-      mat4.mul(this.world.worldMatrix, this.yRotationMatrix, this.xRotationMatrix);
-      this.gl.uniformMatrix4fv(this.world.worldUniformLoc, this.gl.FALSE, this.world.worldMatrix);
-  }
-
   viewModeToggle(state)  {
     if(state == 0) {
       this.gl.drawElements(this.gl.TRIANGLES, this.mesh.index.length, this.gl.UNSIGNED_SHORT, 0);
@@ -196,7 +189,7 @@ export class Actions extends WebGLCore {
   rotation(angleX, angleY, state) {
     if (state == 1) angleX = performance.now() / 6000 * Math.PI;
     mat4.rotate(this.yRotationMatrix, this.identityMatrix, angleX + 0, [0, 1, 0]);
-    mat4.rotate(this.xRotationMatrix, this.identityMatrix, angleY + 300, [1, 0, 0]);
+    if (angleY < 1.5 && angleY > -1.5) mat4.rotate(this.xRotationMatrix, this.identityMatrix, angleY + 300, [1, 0, 0]);
     mat4.mul(this.world.worldMatrix, this.yRotationMatrix, this.xRotationMatrix);
     this.gl.uniformMatrix4fv(this.world.worldUniformLoc, this.gl.FALSE, this.world.worldMatrix);
   }
