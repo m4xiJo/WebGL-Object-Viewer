@@ -24,12 +24,10 @@ import { Memory } from './modules/memory.mjs';
     startTime = new Date().getTime();
     fpsCount = 0;
   };
-  document.getElementsByClassName("stats")[0].innerText = "V: " + mesh.vertex.length + " F: 0 T: 0";
-
+  document.getElementsByClassName("stats")[0].innerText = "V: " + mesh.vertex.length.toString().slice(0, -1) + " F: 0 T: 0";
+  //webgl.gl.clearColor(0.8, 0.8, 0.8, 1.0);
+  //webgl.gl.clear(webgl.gl.DEPTH_BUFFER_BIT | webgl.gl.COLOR_BUFFER_BIT);
   function main() {
-    //console.log(config.core.positions.zoomRatio);
-    webgl.gl.clearColor(0.8, 0.8, 0.8, 1.0);
-    webgl.gl.clear(webgl.gl.DEPTH_BUFFER_BIT | webgl.gl.COLOR_BUFFER_BIT);
     webgl.checkAspectRatio();
     webgl.lightingToggle(config.modes.lightingMode.currstate);
     webgl.viewModeToggle(config.modes.viewMode.currstate);
