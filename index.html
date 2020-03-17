@@ -9,11 +9,12 @@
   </head>
 
   <body oncontextmenu="return false;">
-    <div tabindex="0" class="workArea" class="workArea">
+    <div tabindex="0" class="workArea">
       <div id="loading">
         <div id="lspinner"></div>
         <div id="ltext"></div>
       </div>
+      <div class="tools">
       <div class="notification"><a class="notyTitle">Notification</a></div>
       <div class="modal"><a class="modalTitle">Title</a><input class="btnClose" type="button" value="close"><a class="modalContent"></a></div>
       <div class="verticalPanelRight">
@@ -56,6 +57,7 @@
         <input class="warnings btn" type="button" value="" name="Warning list">
       </div>
       <canvas class="viewport">HTML5 is not supported, cannot draw a 3D viewport!</canvas>
+      </div>
     </div>
     <br>
     <script src="webgl/modules/gl-matrix.js"></script> <!-- Load Matlib -->

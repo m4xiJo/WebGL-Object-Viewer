@@ -156,7 +156,7 @@ export class Modals {
 
   toggleLoader(text) {
     let loader = document.getElementById("loading");
-    let workArea = document.getElementsByClassName("workArea")[0];
+    let workArea = document.getElementsByClassName("tools")[0];
 
     if (loader.style.visibility == "visible") {
       console.log("Hiding!");

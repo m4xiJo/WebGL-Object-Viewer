@@ -56,10 +56,11 @@
       @-webkit-keyframes fadein {0% {opacity: 0; visibility: hidden} 10% {opacity: 1; visibility: visible} 90% {opacity: 1; visibility: visible} 100% {opacity: 0; visibility: hidden}}
       @-ms-keyframes fadein {0% {opacity: 0; visibility: hidden} 10% {opacity: 1; visibility: visible} 90% {opacity: 1; visibility: visible} 100% {opacity: 0; visibility: hidden}}
 
+      .tools {height: 100%; width: 100%}
 
       #loading {
         position: absolute;
-        left: 46.2%;
+        left: 38.2%;
         top: 46.2%;
         z-index: 2;
         opacity: 0;
