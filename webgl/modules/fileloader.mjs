@@ -6,6 +6,8 @@ export class Loader {
   }
 
   async loadFile(url) {
+    let loadtext = document.getElementById("ltext");
+    if (loadtext) loadtext.innerHTML = " " + url.match("[^/]+$");
     return await new Promise((resolve, reject) => {
       if (url == null) return reject("URL was NULL!");
       if (url.match(/\.(glsl|json|obj|dae|blend|fbx|3ds|max)/g)) { // Load mesh files

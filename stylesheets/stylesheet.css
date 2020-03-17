@@ -60,23 +60,28 @@
 
       #loading {
         position: absolute;
-        left: 38.2%;
-        top: 46.2%;
+        top: 50%;
+
+        transform: translate(20%, -20%);
         z-index: 2;
-        opacity: 0;
-        visibility: hidden;
-        transition: .2s opacity;
+        opacity: 1 !important;
+        visibility: visible !important;
+        width: 100%;
       }
 
-      #ltext {display: inline-block;}
-      #ltext::before {
+      #ltext {display: inline-block; vertical-align: 25%; left: 50%; margin-left: 10px;}
+      #ltext, #ltext::before, #ltext::after {
         font-weight: bold;
         font-size: 34px;
         color: white;
-        content: "Loading";
-        animation: varytext 1s linear infinite;
         display: inline-block;
-        vertical-align: 20%;
+      }
+      #ltext::before {
+        content: "Loading ";
+      }
+      #ltext:after {
+        content: "";
+        animation: varytext 1s linear infinite;
       }
 
       #lspinner {
@@ -96,7 +101,7 @@
       }
 
       @keyframes varytext {
-        33% { content: "Loading."; }
-        66% { content: "Loading.."; }
-        100% { content: "Loading..."; }
+        33% { content: "."; }
+        66% { content: ".."; }
+        100% { content: "..."; }
       }
