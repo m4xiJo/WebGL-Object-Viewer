@@ -28,7 +28,8 @@
       .viewport:active {cursor: grabbing; box-shadow: black 0px 0px 8px}
       .verticalPanelRight {z-index: 2; position: absolute; right: 3px; height: 100%}
       .verticalPanelLeft {z-index: 2; position: absolute; left: 3px; height: 100%}
-      .notification {position: absolute; z-index: 3; color: white; width: 100%; opacity: 0; visibility: hidden}
+      .notification {display: table-cell; font-weight: bold; height: 24px; border-top-left-radius: 2px; border-top-right-radius: 2px; position: absolute; z-index: 3; color: white; width: 100%; opacity: 0; visibility: hidden}
+      .notyTitle {vertical-align: middle; padding-left: 5px;}
       .modal {position: absolute; z-index: 3; color: white; width: 100%; opacity: 0; visibility: hidden; transition: 0.2s}
       .modalTitle {padding: 0px 8px 1px 8px; display: block; font-weight: bold}
       .modalContent {padding: 4px 14px 4px 14px;; display: block; background: white; color: black; font-size: small; border-bottom: 1px solid #7e7e7e; overflow-y: auto; max-height: 451px}
