@@ -55,3 +55,46 @@
       @-moz-keyframes fadein {0% {opacity: 0; visibility: hidden} 10% {opacity: 1; visibility: visible} 90% {opacity: 1; visibility: visible} 100% {opacity: 0; visibility: hidden}}
       @-webkit-keyframes fadein {0% {opacity: 0; visibility: hidden} 10% {opacity: 1; visibility: visible} 90% {opacity: 1; visibility: visible} 100% {opacity: 0; visibility: hidden}}
       @-ms-keyframes fadein {0% {opacity: 0; visibility: hidden} 10% {opacity: 1; visibility: visible} 90% {opacity: 1; visibility: visible} 100% {opacity: 0; visibility: hidden}}
+
+
+      #loading {
+        position: absolute;
+        left: 46.2%;
+        top: 46.2%;
+        z-index: 2;
+        opacity: 0;
+        transition: .2s opacity;
+      }
+
+      #ltext {display: inline-block;}
+      #ltext::before {
+        font-weight: bold;
+        font-size: 34px;
+        color: white;
+        content: "Loading";
+        animation: varytext 1s linear infinite;
+        display: inline-block;
+        vertical-align: 20%;
+      }
+
+      #lspinner {
+        width: 40px;
+        height: 40px;
+        transition: all 0.2s;
+        border: 4px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: limegreen;
+        animation: spin .5s linear infinite;
+        border-bottom-color: limegreen;
+        display: inline-block;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      @keyframes varytext {
+        33% { content: "Loading."; }
+        66% { content: "Loading.."; }
+        100% { content: "Loading..."; }
+      }

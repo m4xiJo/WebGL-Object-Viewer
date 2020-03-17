@@ -8,6 +8,7 @@ export class Loader {
     return await new Promise((resolve, reject) => {
       if (url == null) return reject("URL was NULL!");
       if (url.match(/\.(glsl|json|obj|dae|blend|fbx|3ds|max)/g)) { // Load mesh files
+        this.toggleLoader();
         let request = new XMLHttpRequest();
         request.open('GET', url + "?" + Math.random(), true);
         if (url.match(/\.(glsl|json|obj|dae|png)/g)) { // If non binary asset
@@ -15,6 +16,7 @@ export class Loader {
           request.onload = function() {
             if (request.status < 200 || request.status > 299) reject("Error: Status " + request.status + " on resource " + url);
             else resolve(request.responseText);
+            this.toggleLoader();
           }
         }
         else if (url.match(/\.(blend|fbx|3ds|max)/g)) { // If binary asset
@@ -22,6 +24,7 @@ export class Loader {
           request.onload = function() {
             if (request.status < 200 || request.status > 299) reject("Error: Status " + request.status + " on resource " + url);
             else resolve(request.response);
+            this.toggleLoader();
           }
         }
         request.send();
@@ -30,11 +33,18 @@ export class Loader {
         let texture = new Image();
         texture.onload = function() {
           resolve(texture);
+          this.toggleLoader();
         }
         texture.src = url;
       }
       else reject("Not a suitable file format!");
     });
+  }
+
+  async toggleLoader() {
+    let loader = document.getElementById("loading");
+    loader.style.opacity ^= true;
+    loader.style.visibility = "visible";
   }
 
   async loadMesh(meshPath) {
